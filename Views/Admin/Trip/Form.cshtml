@@ -1,0 +1,154 @@
+﻿@model WebVanChuyenLogicstic.Models.Admin.TripFormViewModel
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = Model.Id == 0 ? "Tạo chuyến" : "Sửa chuyến";
+    var vehicles = (List<Vehicle>)ViewBag.Vehicles;
+    var drivers = (List<Driver>)ViewBag.Drivers;
+    var orders = (List<Order>)ViewBag.Orders;
+}
+
+<h4 class="fw-bold mb-4">@ViewData["Title"]</h4>
+
+<form method="post" asp-action="@(Model.Id == 0 ? "Create" : "Edit")" asp-route-id="@(Model.Id == 0 ? null : Model.Id)" class="card border-0 shadow-sm p-4">
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div asp-validation-summary="All" class="alert alert-danger"></div>
+    }
+
+    <label class="form-label fw-semibold">Tuyến đường</label>
+    <input asp-for="Route" class="form-control mb-3" placeholder="Ví dụ: TP.HCM → Đà Nẵng → Hà Nội" />
+
+    <div class="row">
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">Phương tiện</label>
+            <select asp-for="VehicleId" class="form-select mb-3">
+                <option value="">-- Chọn xe --</option>
+                @foreach (var v in vehicles)
+                {
+                    <option value="@v.Id" data-cap="@((v.CapacityKg ?? 0).ToString(System.Globalization.CultureInfo.InvariantCulture))" selected="@(v.Id == Model.VehicleId)">@v.PlateNumber (@v.VehicleType, @(v.CapacityKg?.ToString("n0") ?? "?") kg)</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">Tài xế</label>
+            <select asp-for="DriverId" class="form-select mb-3">
+                <option value="">-- Chọn tài xế --</option>
+                @foreach (var d in drivers)
+                {
+                    <option value="@d.Id" selected="@(d.Id == Model.DriverId)">@d.FullName</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <label class="form-label fw-semibold">Dự kiến khởi hành</label>
+    <input name="DepartAt" type="datetime-local" value="@Model.DepartAt?.ToString("yyyy-MM-ddTHH:mm")" class="form-control mb-3" />
+
+    <label class="form-label fw-semibold">Đơn hàng trong chuyến</label>
+
+    <div class="row g-2 mb-2">
+        <div class="col-md-5">
+            <input id="oq" class="form-control form-control-sm" placeholder="Tìm theo tên khách, SĐT, mã đơn, địa chỉ..." />
+        </div>
+        <div class="col-md-2"><input id="okgMin" type="number" min="0" class="form-control form-control-sm" placeholder="Từ kg" /></div>
+        <div class="col-md-2"><input id="okgMax" type="number" min="0" class="form-control form-control-sm" placeholder="Đến kg" /></div>
+        <div class="col-md-3">
+            <select id="osvc" class="form-select form-select-sm">
+                <option value="">Mọi dịch vụ</option>
+                @foreach (var n in orders.Select(o => o.Service?.Name).Where(n => n != null).Distinct())
+                {
+                    <option value="@(n!.ToLowerInvariant())">@n</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="form-check mb-2">
+        <input id="ofit" type="checkbox" class="form-check-input" />
+        <label for="ofit" class="form-check-label small">Chỉ hiện đơn còn vừa tải trọng của xe</label>
+    </div>
+
+    <div id="olist" class="border rounded p-2 mb-1" style="max-height:300px;overflow:auto">
+        @foreach (var o in orders)
+        {
+            var excl = o.Service?.IsExclusive == true;
+            <label class="orow d-flex gap-2 align-items-start py-1 border-bottom"
+                   data-kg="@((o.WeightKg ?? 0).ToString(System.Globalization.CultureInfo.InvariantCulture))"
+                   data-excl="@(excl ? "1" : "0")"
+                   data-svc="@((o.Service?.Name ?? "").ToLowerInvariant())"
+                   data-q="@($"{o.OrderCode} {o.CustomerName} {o.Phone} {o.PickupAddress} {o.DeliveryAddress}".ToLowerInvariant())">
+                <input type="checkbox" name="OrderIds" value="@o.Id" checked="@Model.OrderIds.Contains(o.Id)" class="mt-1" />
+                <span class="flex-grow-1">
+                    <strong>@o.CustomerName</strong> · @o.Phone
+                    <span class="text-muted small">(@o.OrderCode)</span>
+                    @if (excl)
+                    {
+                        <span class="badge bg-warning-subtle text-warning border border-warning ms-1">Nguyên chuyến</span>
+                    }
+                    <br />
+                    <span class="small">@(o.Service?.Name ?? "—") · <b>@(o.WeightKg?.ToString("n1") ?? "—") kg</b></span><br />
+                    <span class="small text-muted">@o.PickupAddress → @o.DeliveryAddress</span>
+                </span>
+            </label>
+        }
+        @if (!orders.Any())
+        {
+            <div class="text-muted small p-2">Không có đơn nào sẵn sàng để ghép.</div>
+        }
+    </div>
+    <div id="osum" class="small mb-3"></div>
+
+    <label class="form-label fw-semibold">Ghi chú</label>
+    <textarea asp-for="Note" rows="2" class="form-control mb-3"></textarea>
+
+    <div class="d-flex gap-2">
+        <button class="btn btn-primary">Lưu chuyến</button>
+        <a asp-action="Index" class="btn btn-light border">Quay lại</a>
+    </div>
+
+    <script>
+        (function () {
+            const rows = [...document.querySelectorAll('.orow')];
+            const vehicle = document.getElementById('VehicleId');
+            const $ = id => document.getElementById(id);
+            const cap = () => parseFloat(vehicle.selectedOptions[0]?.dataset.cap || 0);
+            const box = r => r.querySelector('input[type=checkbox]');
+
+            function refresh() {
+                const q = $('oq').value.trim().toLowerCase();
+                const min = parseFloat($('okgMin').value), max = parseFloat($('okgMax').value);
+                const svc = $('osvc').value;
+                const picked = rows.filter(r => box(r).checked);
+                const total = picked.reduce((s, r) => s + parseFloat(r.dataset.kg), 0);
+                const hasExcl = picked.some(r => r.dataset.excl === '1');
+                const left = cap() > 0 ? cap() - total : Infinity;
+
+                rows.forEach(r => {
+                    const kg = parseFloat(r.dataset.kg), checked = box(r).checked;
+                    let show = (!q || r.dataset.q.includes(q))
+                            && (isNaN(min) || kg >= min) && (isNaN(max) || kg <= max)
+                            && (!svc || r.dataset.svc === svc)
+                            && (!$('ofit').checked || kg <= left);
+                    r.classList.toggle('d-none', !(show || checked));   // đơn đã chọn luôn hiện
+
+                    // khóa theo quy tắc nguyên chuyến
+                    const excl = r.dataset.excl === '1';
+                    box(r).disabled = !checked && ((hasExcl) || (excl && picked.length > 0));
+                    r.classList.toggle('opacity-50', box(r).disabled);
+                });
+
+                const over = cap() > 0 && total > cap();
+                $('osum').innerHTML = `Đã chọn <b>${picked.length}</b> đơn · <b>${total.toLocaleString('vi-VN')}</b> kg`
+                    + (cap() > 0 ? ` / tải trọng ${cap().toLocaleString('vi-VN')} kg` : '')
+                    + (over ? ' <span class="text-danger fw-semibold">— vượt tải trọng</span>' : '')
+                    + (hasExcl ? ' <span class="text-warning">— đơn nguyên chuyến, không ghép thêm đơn khác</span>' : '');
+                $('osum').className = 'small mb-3 ' + (over ? 'text-danger' : 'text-muted');
+            }
+
+            ['oq','okgMin','okgMax'].forEach(i => $(i).addEventListener('input', refresh));
+            ['osvc','ofit'].forEach(i => $(i).addEventListener('change', refresh));
+            vehicle.addEventListener('change', refresh);
+            rows.forEach(r => box(r).addEventListener('change', refresh));
+            refresh();
+        })();
+    </script>
+</form>

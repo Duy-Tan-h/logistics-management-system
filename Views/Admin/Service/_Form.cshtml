@@ -1,0 +1,99 @@
+﻿@model WebVanChuyenLogicstic.Models.TransportService
+@{
+    var isNew = Model.Id == 0;
+}
+
+<form asp-action="@(isNew ? "Create" : "Edit")" asp-route-id="@Model.Id" method="post" class="card border-0 shadow-sm p-4" style="max-width:760px">
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label fw-semibold">Tên dịch vụ <span class="text-danger">*</span></label>
+        <input asp-for="Name" class="form-control" placeholder="Ví dụ: Vận chuyển đường bộ" />
+        <span asp-validation-for="Name" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Summary" class="form-label fw-semibold">Mô tả ngắn <span class="text-danger">*</span></label>
+        <textarea asp-for="Summary" rows="2" class="form-control"></textarea>
+        <div class="form-text">Hiện trên thẻ dịch vụ ở trang chủ và trang Dịch vụ.</div>
+        <span asp-validation-for="Summary" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label fw-semibold">Mô tả chi tiết</label>
+        <textarea asp-for="Description" rows="6" class="form-control"></textarea>
+        <div class="form-text">Hiện ở trang chi tiết dịch vụ. Để trống thì dùng nội dung mặc định.</div>
+        <span asp-validation-for="Description" class="text-danger small"></span>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <label asp-for="DeliveryTime" class="form-label fw-semibold">Thời gian giao dự kiến <span class="text-danger">*</span></label>
+            <input asp-for="DeliveryTime" class="form-control" placeholder="1 - 4 ngày" />
+            <span asp-validation-for="DeliveryTime" class="text-danger small"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="PriceNote" class="form-label fw-semibold">Ghi chú giá <span class="text-danger">*</span></label>
+            <input asp-for="PriceNote" class="form-control" placeholder="Từ 35.000đ" />
+            <span asp-validation-for="PriceNote" class="text-danger small"></span>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <label asp-for="Icon" class="form-label fw-semibold">Biểu tượng <span class="text-danger">*</span></label>
+            <input asp-for="Icon" class="form-control" list="icon-list" placeholder="bi-truck" />
+            <datalist id="icon-list">
+                <option value="bi-truck"></option>
+                <option value="bi-lightning-charge"></option>
+                <option value="bi-map"></option>
+                <option value="bi-box-seam"></option>
+                <option value="bi-buildings"></option>
+                <option value="bi-cash-coin"></option>
+                <option value="bi-airplane"></option>
+                <option value="bi-boxes"></option>
+                <option value="bi-snow"></option>
+            </datalist>
+            <div class="form-text">Tên icon Bootstrap Icons, bắt đầu bằng bi-.</div>
+            <span asp-validation-for="Icon" class="text-danger small"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="ImageUrl" class="form-label fw-semibold">Đường dẫn ảnh</label>
+            <input asp-for="ImageUrl" class="form-control" placeholder="/images/Services/ten-anh.jpg" />
+            <div class="form-text">Để trống thì hiện icon thay cho ảnh.</div>
+            <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4 align-items-end">
+        <div class="col-md-4">
+            <div class="form-check form-switch">
+                <input asp-for="IsVisible" class="form-check-input" />
+                <label asp-for="IsVisible" class="form-check-label fw-semibold">Hiển thị trên website</label>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-check form-switch">
+                <input asp-for="IsFeatured" class="form-check-input" />
+                <label asp-for="IsFeatured" class="form-check-label fw-semibold">Nổi bật ở trang chủ</label>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="FeaturedOrder" class="form-label fw-semibold">Thứ tự nổi bật</label>
+            <input asp-for="FeaturedOrder" type="number" min="0" max="999" class="form-control" />
+            <span asp-validation-for="FeaturedOrder" class="text-danger small"></span>
+        </div>
+        <div class="col-md-4">
+            <div class="form-check form-switch">
+                <input asp-for="IsExclusive" class="form-check-input" />
+                <label asp-for="IsExclusive" class="form-check-label fw-semibold">Xe dành riêng (nguyên chuyến)</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-end">
+        <a asp-action="Index" class="btn btn-light border me-2">Hủy</a>
+        <button type="submit" class="btn btn-primary px-4">@(isNew ? "Thêm dịch vụ" : "Lưu thay đổi")</button>
+    </div>
+</form>

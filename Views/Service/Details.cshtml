@@ -1,0 +1,31 @@
+@model TransportService
+@{ ViewData["Title"] = Model.Name; }
+<partial name="_PageHero" model='new WebVanChuyenLogicstic.Models.PageHeroViewModel(Model.Name, Model.Summary, Model.Icon)' />
+<section class="section-space"><div class="container"><div class="row g-5">
+            <div class="col-lg-8">
+                <div class="content-card">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" alt="@Model.Name" class="w-100 mb-4" style="max-height:340px;object-fit:cover;border-radius:16px" />
+                    }
+                    <span class="section-kicker">THÔNG TIN DỊCH VỤ</span>
+                    @if (!string.IsNullOrWhiteSpace(Model.Description))
+                    {
+                        <p class="mt-3" style="white-space:pre-line">@Model.Description</p>
+                    }
+                    else
+                    {
+                        <h2 class="mt-2">Vận chuyển an tâm từ điểm gửi đến điểm nhận</h2>
+                    
+                        <p>LMS Express tiếp nhận yêu cầu, tư vấn phương án phù hợp, kiểm soát hàng hóa và cập nhật trạng thái xuyên suốt hành trình.</p>
+                    }
+<div class="feature-list"><div><i class="bi bi-check-circle-fill"></i> Theo dõi trạng thái minh bạch</div><div><i class="bi bi-check-circle-fill"></i> Hỗ trợ xử lý 24/7</div><div><i class="bi bi-check-circle-fill"></i> Quy trình bàn giao rõ ràng</div><div><i class="bi bi-check-circle-fill"></i> Cam kết an toàn hàng hóa</div></div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <aside class="quote-card">
+                    <h4>Thông tin nhanh</h4><p><i class="bi bi-clock"></i><span>Thời gian dự kiến<strong>@Model.DeliveryTime</strong></span></p><p><i class="bi bi-tag"></i><span>Chi phí<strong>@Model.PriceNote</strong></span></p><a asp-controller="Service" asp-action="Quote" asp-route-serviceId="@Model.Id" class="btn btn-accent w-100 mb-2">Tạo đơn vận chuyển</a>
+                    <a asp-controller="Home" asp-action="Contact" class="btn btn-outline-secondary w-100">Nhận tư vấn</a>
+                </aside>
+            </div>
+</div></div></section>

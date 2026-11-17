@@ -1,0 +1,74 @@
+﻿@model WebVanChuyenLogicstic.Models.Order?
+@{
+    ViewData["Title"] = "Báo giá vận chuyển";
+    var msg = TempData["Msg"] as string;
+}
+
+<section class="qt-page">
+    <div class="container">
+        <div class="qt-done">
+            <div class="qt-card">
+                @if (Model is null)
+                {
+                    <div class="qt-check" style="background:#fdecea;color:#c62828"><i class="bi bi-x-lg"></i></div>
+                    <h3>Liên kết không hợp lệ</h3>
+                    <p>Liên kết báo giá không tồn tại, hoặc đã được thay bằng báo giá mới. Vui lòng kiểm tra email mới nhất hoặc liên hệ với chúng tôi.</p>
+                    <a class="btn btn-accent" asp-controller="Home" asp-action="Contact">Liên hệ</a>
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(msg))
+                    {
+
+                        <div class="alert alert-info text-start">@msg</div>
+                    }
+
+                    <h3>Báo giá cho đơn @Model.OrderCode</h3>
+                    <div class="qt-quote-price mt-3">@OrderFormat.Money(Model.QuotedPrice)</div>
+                    <p class="mb-0">Hiệu lực đến hết ngày @(Model.QuoteValidUntil?.ToString("dd/MM/yyyy"))</p>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.QuoteNote))
+                    {
+                        <p class="text-start mt-3 p-3" style="background:var(--surface);border-radius:var(--radius-sm)"><strong>Ghi chú về giá:</strong> @Model.QuoteNote</p>
+                    }
+
+                    <div class="qt-facts">
+                        <div><span>Lấy hàng</span><strong>@Model.PickupAddress</strong></div>
+                        <div><span>Giao hàng</span><strong>@Model.DeliveryAddress</strong></div>
+                        <div><span>Hàng hóa</span><strong>@(Model.CargoType ?? "—")</strong></div>
+                        @if (Model.Service != null)
+                        {
+                            <div><span>Dịch vụ</span><strong>@Model.Service.Name</strong></div>
+                        }
+                    </div>
+
+                    @if (Model.IsQuoteOpen)
+                    {
+                        <div class="d-grid gap-2">
+                            <form asp-action="Accept" asp-route-token="@Model.QuoteToken" method="post">
+                                <button class="btn btn-accent btn-lg w-100">Đồng ý báo giá</button>
+                            </form>
+                            <form asp-action="Decline" asp-route-token="@Model.QuoteToken" method="post" onsubmit="return confirm('Bạn chắc chắn muốn từ chối báo giá này?');">
+                                <button class="btn btn-outline-secondary w-100">Từ chối</button>
+                            </form>
+                        </div>
+                    }
+                    else if (Model.Status == OrderStatuses.Quoted)
+                    {
+                        <div class="alert alert-warning text-start mb-3">Báo giá đã hết hạn. Vui lòng liên hệ để nhận báo giá mới.</div>
+                        <a class="btn btn-accent" asp-controller="Home" asp-action="Contact">Liên hệ</a>
+                    }
+                    else if (Model.Status == OrderStatuses.Cancelled)
+                    {
+                        <div class="alert alert-secondary text-start mb-0">Đơn hàng này đã bị hủy.</div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success text-start mb-3">Báo giá đã được đồng ý, đơn hàng đang ở trạng thái <strong>@Model.Status</strong>.</div>
+                        <a class="btn btn-accent" asp-controller="Tracking" asp-action="Index" asp-route-code="@Model.OrderCode">Tra cứu đơn hàng</a>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,624 @@
+{
+  "checks": 88,
+  "links": 50,
+  "errors": [],
+  "report": [
+    {
+      "width": 1440,
+      "route": "/",
+      "status": 200,
+      "overflow": false,
+      "title": "Giải pháp logistics\nthông minh & toàn diện"
+    },
+    {
+      "width": 1440,
+      "route": "/Home/About",
+      "status": 200,
+      "overflow": false,
+      "title": "Kết nối hàng hóa, kiến tạo giá trị"
+    },
+    {
+      "width": 1440,
+      "route": "/Home/Contact",
+      "status": 200,
+      "overflow": false,
+      "title": "Chúng tôi luôn sẵn sàng lắng nghe"
+    },
+    {
+      "width": 1440,
+      "route": "/Home/Faq",
+      "status": 200,
+      "overflow": false,
+      "title": "Câu hỏi thường gặp"
+    },
+    {
+      "width": 1440,
+      "route": "/Home/Policy",
+      "status": 200,
+      "overflow": false,
+      "title": "Chính sách bảo mật"
+    },
+    {
+      "width": 1440,
+      "route": "/Home/Terms",
+      "status": 200,
+      "overflow": false,
+      "title": "Điều khoản dịch vụ"
+    },
+    {
+      "width": 1440,
+      "route": "/Service",
+      "status": 200,
+      "overflow": false,
+      "title": "Dịch vụ linh hoạt cho mọi nhu cầu"
+    },
+    {
+      "width": 1440,
+      "route": "/Service/Quote",
+      "status": 200,
+      "overflow": false,
+      "title": "Tìm phương án vận chuyển phù hợp"
+    },
+    {
+      "width": 1440,
+      "route": "/News",
+      "status": 200,
+      "overflow": false,
+      "title": "Góc nhìn logistics"
+    },
+    {
+      "width": 1440,
+      "route": "/News/Details/1",
+      "status": 200,
+      "overflow": false,
+      "title": "5 xu hướng logistics nổi bật giúp doanh nghiệp tối ưu chi phí"
+    },
+    {
+      "width": 1440,
+      "route": "/News/Details/2",
+      "status": 200,
+      "overflow": false,
+      "title": "Cách đóng gói hàng hóa an toàn khi vận chuyển đường dài"
+    },
+    {
+      "width": 1440,
+      "route": "/News/Details/3",
+      "status": 200,
+      "overflow": false,
+      "title": "Những lưu ý khi gửi hàng quốc tế doanh nghiệp cần biết"
+    },
+    {
+      "width": 1440,
+      "route": "/News/Details/4",
+      "status": 200,
+      "overflow": false,
+      "title": "Nên chọn hàng ghép hay thuê xe nguyên chuyến?"
+    },
+    {
+      "width": 1440,
+      "route": "/News/Details/5",
+      "status": 200,
+      "overflow": false,
+      "title": "Logistics xanh: Bắt đầu từ những thay đổi nhỏ"
+    },
+    {
+      "width": 1440,
+      "route": "/News/Details/6",
+      "status": 200,
+      "overflow": false,
+      "title": "Giải pháp giao hàng cho doanh nghiệp bán lẻ đa kênh"
+    },
+    {
+      "width": 1440,
+      "route": "/Tracking",
+      "status": 200,
+      "overflow": false,
+      "title": "Đơn hàng của bạn đang ở đâu?"
+    },
+    {
+      "width": 1440,
+      "route": "/Tracking?code=LMS24091234",
+      "status": 200,
+      "overflow": false,
+      "title": "Đơn hàng của bạn đang ở đâu?"
+    },
+    {
+      "width": 1440,
+      "route": "/Tracking?code=NOT-FOUND",
+      "status": 200,
+      "overflow": false,
+      "title": "Đơn hàng của bạn đang ở đâu?"
+    },
+    {
+      "width": 1440,
+      "route": "/Account/Login",
+      "status": 200,
+      "overflow": false,
+      "title": "Đăng nhập tài khoản"
+    },
+    {
+      "width": 1440,
+      "route": "/Account/Register",
+      "status": 200,
+      "overflow": false,
+      "title": "Đăng ký tài khoản"
+    },
+    {
+      "width": 1440,
+      "route": "/Account/ForgotPassword",
+      "status": 200,
+      "overflow": false,
+      "title": "Quên mật khẩu?"
+    },
+    {
+      "width": 1440,
+      "route": "/Home/Error",
+      "status": 200,
+      "overflow": false,
+      "title": "Chưa thể hoàn tất yêu cầu"
+    },
+    {
+      "width": 768,
+      "route": "/",
+      "status": 200,
+      "overflow": false,
+      "title": "Giải pháp logistics\nthông minh & toàn diện"
+    },
+    {
+      "width": 768,
+      "route": "/Home/About",
+      "status": 200,
+      "overflow": false,
+      "title": "Kết nối hàng hóa, kiến tạo giá trị"
+    },
+    {
+      "width": 768,
+      "route": "/Home/Contact",
+      "status": 200,
+      "overflow": false,
+      "title": "Chúng tôi luôn sẵn sàng lắng nghe"
+    },
+    {
+      "width": 768,
+      "route": "/Home/Faq",
+      "status": 200,
+      "overflow": false,
+      "title": "Câu hỏi thường gặp"
+    },
+    {
+      "width": 768,
+      "route": "/Home/Policy",
+      "status": 200,
+      "overflow": false,
+      "title": "Chính sách bảo mật"
+    },
+    {
+      "width": 768,
+      "route": "/Home/Terms",
+      "status": 200,
+      "overflow": false,
+      "title": "Điều khoản dịch vụ"
+    },
+    {
+      "width": 768,
+      "route": "/Service",
+      "status": 200,
+      "overflow": false,
+      "title": "Dịch vụ linh hoạt cho mọi nhu cầu"
+    },
+    {
+      "width": 768,
+      "route": "/Service/Quote",
+      "status": 200,
+      "overflow": false,
+      "title": "Tìm phương án vận chuyển phù hợp"
+    },
+    {
+      "width": 768,
+      "route": "/News",
+      "status": 200,
+      "overflow": false,
+      "title": "Góc nhìn logistics"
+    },
+    {
+      "width": 768,
+      "route": "/News/Details/1",
+      "status": 200,
+      "overflow": false,
+      "title": "5 xu hướng logistics nổi bật giúp doanh nghiệp tối ưu chi phí"
+    },
+    {
+      "width": 768,
+      "route": "/News/Details/2",
+      "status": 200,
+      "overflow": false,
+      "title": "Cách đóng gói hàng hóa an toàn khi vận chuyển đường dài"
+    },
+    {
+      "width": 768,
+      "route": "/News/Details/3",
+      "status": 200,
+      "overflow": false,
+      "title": "Những lưu ý khi gửi hàng quốc tế doanh nghiệp cần biết"
+    },
+    {
+      "width": 768,
+      "route": "/News/Details/4",
+      "status": 200,
+      "overflow": false,
+      "title": "Nên chọn hàng ghép hay thuê xe nguyên chuyến?"
+    },
+    {
+      "width": 768,
+      "route": "/News/Details/5",
+      "status": 200,
+      "overflow": false,
+      "title": "Logistics xanh: Bắt đầu từ những thay đổi nhỏ"
+    },
+    {
+      "width": 768,
+      "route": "/News/Details/6",
+      "status": 200,
+      "overflow": false,
+      "title": "Giải pháp giao hàng cho doanh nghiệp bán lẻ đa kênh"
+    },
+    {
+      "width": 768,
+      "route": "/Tracking",
+      "status": 200,
+      "overflow": false,
+      "title": "Đơn hàng của bạn đang ở đâu?"
+    },
+    {
+      "width": 768,
+      "route": "/Tracking?code=LMS24091234",
+      "status": 200,
+      "overflow": false,
+      "title": "Đơn hàng của bạn đang ở đâu?"
+    },
+    {
+      "width": 768,
+      "route": "/Tracking?code=NOT-FOUND",
+      "status": 200,
+      "overflow": false,
+      "title": "Đơn hàng của bạn đang ở đâu?"
+    },
+    {
+      "width": 768,
+      "route": "/Account/Login",
+      "status": 200,
+      "overflow": false,
+      "title": "Đăng nhập tài khoản"
+    },
+    {
+      "width": 768,
+      "route": "/Account/Register",
+      "status": 200,
+      "overflow": false,
+      "title": "Đăng ký tài khoản"
+    },
+    {
+      "width": 768,
+      "route": "/Account/ForgotPassword",
+      "status": 200,
+      "overflow": false,
+      "title": "Quên mật khẩu?"
+    },
+    {
+      "width": 768,
+      "route": "/Home/Error",
+      "status": 200,
+      "overflow": false,
+      "title": "Chưa thể hoàn tất yêu cầu"
+    },
+    {
+      "width": 390,
+      "route": "/",
+      "status": 200,
+      "overflow": false,
+      "title": "Giải pháp logistics\nthông minh & toàn diện"
+    },
+    {
+      "width": 390,
+      "route": "/Home/About",
+      "status": 200,
+      "overflow": false,
+      "title": "Kết nối hàng hóa, kiến tạo giá trị"
+    },
+    {
+      "width": 390,
+      "route": "/Home/Contact",
+      "status": 200,
+      "overflow": false,
+      "title": "Chúng tôi luôn sẵn sàng lắng nghe"
+    },
+    {
+      "width": 390,
+      "route": "/Home/Faq",
+      "status": 200,
+      "overflow": false,
+      "title": "Câu hỏi thường gặp"
+    },
+    {
+      "width": 390,
+      "route": "/Home/Policy",
+      "status": 200,
+      "overflow": false,
+      "title": "Chính sách bảo mật"
+    },
+    {
+      "width": 390,
+      "route": "/Home/Terms",
+      "status": 200,
+      "overflow": false,
+      "title": "Điều khoản dịch vụ"
+    },
+    {
+      "width": 390,
+      "route": "/Service",
+      "status": 200,
+      "overflow": false,
+      "title": "Dịch vụ linh hoạt cho mọi nhu cầu"
+    },
+    {
+      "width": 390,
+      "route": "/Service/Quote",
+      "status": 200,
+      "overflow": false,
+      "title": "Tìm phương án vận chuyển phù hợp"
+    },
+    {
+      "width": 390,
+      "route": "/News",
+      "status": 200,
+      "overflow": false,
+      "title": "Góc nhìn logistics"
+    },
+    {
+      "width": 390,
+      "route": "/News/Details/1",
+      "status": 200,
+      "overflow": false,
+      "title": "5 xu hướng logistics nổi bật giúp doanh nghiệp tối ưu chi phí"
+    },
+    {
+      "width": 390,
+      "route": "/News/Details/2",
+      "status": 200,
+      "overflow": false,
+      "title": "Cách đóng gói hàng hóa an toàn khi vận chuyển đường dài"
+    },
+    {
+      "width": 390,
+      "route": "/News/Details/3",
+      "status": 200,
+      "overflow": false,
+      "title": "Những lưu ý khi gửi hàng quốc tế doanh nghiệp cần biết"
+    },
+    {
+      "width": 390,
+      "route": "/News/Details/4",
+      "status": 200,
+      "overflow": false,
+      "title": "Nên chọn hàng ghép hay thuê xe nguyên chuyến?"
+    },
+    {
+      "width": 390,
+      "route": "/News/Details/5",
+      "status": 200,
+      "overflow": false,
+      "title": "Logistics xanh: Bắt đầu từ những thay đổi nhỏ"
+    },
+    {
+      "width": 390,
+      "route": "/News/Details/6",
+      "status": 200,
+      "overflow": false,
+      "title": "Giải pháp giao hàng cho doanh nghiệp bán lẻ đa kênh"
+    },
+    {
+      "width": 390,
+      "route": "/Tracking",
+      "status": 200,
+      "overflow": false,
+      "title": "Đơn hàng của bạn đang ở đâu?"
+    },
+    {
+      "width": 390,
+      "route": "/Tracking?code=LMS24091234",
+      "status": 200,
+      "overflow": false,
+      "title": "Đơn hàng của bạn đang ở đâu?"
+    },
+    {
+      "width": 390,
+      "route": "/Tracking?code=NOT-FOUND",
+      "status": 200,
+      "overflow": false,
+      "title": "Đơn hàng của bạn đang ở đâu?"
+    },
+    {
+      "width": 390,
+      "route": "/Account/Login",
+      "status": 200,
+      "overflow": false,
+      "title": "Đăng nhập tài khoản"
+    },
+    {
+      "width": 390,
+      "route": "/Account/Register",
+      "status": 200,
+      "overflow": false,
+      "title": "Đăng ký tài khoản"
+    },
+    {
+      "width": 390,
+      "route": "/Account/ForgotPassword",
+      "status": 200,
+      "overflow": false,
+      "title": "Quên mật khẩu?"
+    },
+    {
+      "width": 390,
+      "route": "/Home/Error",
+      "status": 200,
+      "overflow": false,
+      "title": "Chưa thể hoàn tất yêu cầu"
+    },
+    {
+      "width": 320,
+      "route": "/",
+      "status": 200,
+      "overflow": false,
+      "title": "Giải pháp logistics\nthông minh & toàn diện"
+    },
+    {
+      "width": 320,
+      "route": "/Home/About",
+      "status": 200,
+      "overflow": false,
+      "title": "Kết nối hàng hóa, kiến tạo giá trị"
+    },
+    {
+      "width": 320,
+      "route": "/Home/Contact",
+      "status": 200,
+      "overflow": false,
+      "title": "Chúng tôi luôn sẵn sàng lắng nghe"
+    },
+    {
+      "width": 320,
+      "route": "/Home/Faq",
+      "status": 200,
+      "overflow": false,
+      "title": "Câu hỏi thường gặp"
+    },
+    {
+      "width": 320,
+      "route": "/Home/Policy",
+      "status": 200,
+      "overflow": false,
+      "title": "Chính sách bảo mật"
+    },
+    {
+      "width": 320,
+      "route": "/Home/Terms",
+      "status": 200,
+      "overflow": false,
+      "title": "Điều khoản dịch vụ"
+    },
+    {
+      "width": 320,
+      "route": "/Service",
+      "status": 200,
+      "overflow": false,
+      "title": "Dịch vụ linh hoạt cho mọi nhu cầu"
+    },
+    {
+      "width": 320,
+      "route": "/Service/Quote",
+      "status": 200,
+      "overflow": false,
+      "title": "Tìm phương án vận chuyển phù hợp"
+    },
+    {
+      "width": 320,
+      "route": "/News",
+      "status": 200,
+      "overflow": false,
+      "title": "Góc nhìn logistics"
+    },
+    {
+      "width": 320,
+      "route": "/News/Details/1",
+      "status": 200,
+      "overflow": false,
+      "title": "5 xu hướng logistics nổi bật giúp doanh nghiệp tối ưu chi phí"
+    },
+    {
+      "width": 320,
+      "route": "/News/Details/2",
+      "status": 200,
+      "overflow": false,
+      "title": "Cách đóng gói hàng hóa an toàn khi vận chuyển đường dài"
+    },
+    {
+      "width": 320,
+      "route": "/News/Details/3",
+      "status": 200,
+      "overflow": false,
+      "title": "Những lưu ý khi gửi hàng quốc tế doanh nghiệp cần biết"
+    },
+    {
+      "width": 320,
+      "route": "/News/Details/4",
+      "status": 200,
+      "overflow": false,
+      "title": "Nên chọn hàng ghép hay thuê xe nguyên chuyến?"
+    },
+    {
+      "width": 320,
+      "route": "/News/Details/5",
+      "status": 200,
+      "overflow": false,
+      "title": "Logistics xanh: Bắt đầu từ những thay đổi nhỏ"
+    },
+    {
+      "width": 320,
+      "route": "/News/Details/6",
+      "status": 200,
+      "overflow": false,
+      "title": "Giải pháp giao hàng cho doanh nghiệp bán lẻ đa kênh"
+    },
+    {
+      "width": 320,
+      "route": "/Tracking",
+      "status": 200,
+      "overflow": false,
+      "title": "Đơn hàng của bạn đang ở đâu?"
+    },
+    {
+      "width": 320,
+      "route": "/Tracking?code=LMS24091234",
+      "status": 200,
+      "overflow": false,
+      "title": "Đơn hàng của bạn đang ở đâu?"
+    },
+    {
+      "width": 320,
+      "route": "/Tracking?code=NOT-FOUND",
+      "status": 200,
+      "overflow": false,
+      "title": "Đơn hàng của bạn đang ở đâu?"
+    },
+    {
+      "width": 320,
+      "route": "/Account/Login",
+      "status": 200,
+      "overflow": false,
+      "title": "Đăng nhập tài khoản"
+    },
+    {
+      "width": 320,
+      "route": "/Account/Register",
+      "status": 200,
+      "overflow": false,
+      "title": "Đăng ký tài khoản"
+    },
+    {
+      "width": 320,
+      "route": "/Account/ForgotPassword",
+      "status": 200,
+      "overflow": false,
+      "title": "Quên mật khẩu?"
+    },
+    {
+      "width": 320,
+      "route": "/Home/Error",
+      "status": 200,
+      "overflow": false,
+      "title": "Chưa thể hoàn tất yêu cầu"
+    }
+  ],
+  "interactions": "Passed"
+}

@@ -1,0 +1,95 @@
+@using WebVanChuyenLogicstic.Models
+@model IEnumerable<WebVanChuyenLogicstic.Models.Article>
+@{
+    ViewData["Title"] = "Tin tức & Kỹ năng Logistics";
+}
+
+<!-- Thay thế Hero Section tĩnh bằng Partial View _PageHero -->
+<partial name="_PageHero" model='new WebVanChuyenLogicstic.Models.PageHeroViewModel("Cập nhật tin tức Logistics", "Theo dõi các thông báo mới nhất, chương trình khuyến mãi và kinh nghiệm quản lý chuỗi cung ứng từ LMS Express.", "bi-newspaper")' />
+
+<!-- Bộ lọc chuyên mục -->
+@{
+    var categories = (List<string>)ViewBag.Categories;
+    var currentCat = ViewBag.Category as string;
+    var curPage = (int)ViewBag.Page;
+    var totalPages = (int)ViewBag.TotalPages;
+}
+<section class="py-4">
+    <div class="container text-center">
+        <div class="btn-group shadow-sm filter-group flex-wrap" role="group">
+            <a asp-action="Index" class="btn px-4 @(string.IsNullOrEmpty(currentCat) ? "btn-primary" : "btn-outline-primary")">Tất cả</a>
+            @foreach (var c in categories)
+            {
+                <a asp-action="Index" asp-route-category="@c" class="btn px-4 @(currentCat == c ? "btn-primary" : "btn-outline-primary")">@c</a>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Danh sách Bài viết -->
+<section class="section-space pb-5">
+    <div class="container">
+        <div class="row g-4">
+            @if (Model != null && Model.Any())
+            {
+                foreach (var article in Model)
+                {
+                    <!-- Gắn data-category để JS nhận diện khi lọc -->
+                    <div class="col-md-4 article-item" data-category="@article.Category">
+                        <div class="card h-100 border-0 shadow-sm @article.ArtClass" style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+
+                            <!-- Hiển thị Icon -->
+                            @if (!string.IsNullOrEmpty(article.ImageUrl))
+                            {
+                                <img src="@article.ImageUrl" alt="@article.Title" class="card-img-top" style="height: 180px; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <div class="card-img-top bg-primary bg-opacity-10 d-flex justify-content-center align-items-center" style="height: 180px;">
+                                    <i class="bi @article.Icon text-primary" style="font-size: 4rem;"></i>
+                                </div>
+                            }
+
+                            <!-- Nội dung bài viết -->
+                            <div class="card-body p-4 flex-grow-1">
+                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 mb-3">@article.Category</span>
+                                <h5 class="card-title fw-bold" style="line-height: 1.4;">
+                                    <a asp-controller="News" asp-action="Details" asp-route-id="@article.Id" class="text-dark text-decoration-none">@article.Title</a>
+                                </h5>
+                                <p class="card-text text-muted mt-3" style="font-size: 0.95rem;">@article.Summary</p>
+                            </div>
+
+                            <!-- Footer Card -->
+                            <div class="card-footer bg-white border-top border-light p-4 pt-3 d-flex justify-content-between align-items-center">
+                                <span class="text-muted small fw-medium"><i class="bi bi-calendar3 me-1"></i> @article.PublishedAt.ToString("dd/MM/yyyy")</span>
+                                <a asp-controller="News" asp-action="Details" asp-route-id="@article.Id" class="text-primary fw-bold text-decoration-none">
+                                    Đọc tiếp <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted">Hiện tại chưa có bài viết nào.</p>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+@if (totalPages > 1)
+{
+    <nav class="container pb-5">
+        <ul class="pagination justify-content-center">
+            @for (var i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == curPage ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-category="@currentCat" asp-route-page="@i">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

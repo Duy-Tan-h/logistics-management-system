@@ -1,0 +1,50 @@
+﻿@model WebVanChuyenLogicstic.Models.Driver
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Thêm tài xế";
+}
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a asp-action="Index" class="btn btn-light border"><i class="bi bi-arrow-left"></i></a>
+    <h4 class="fw-bold mb-0">Thêm tài xế mới</h4>
+</div>
+
+<form asp-action="Create" method="post" class="card border-0 shadow-sm p-4" style="max-width:650px">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="FullName" class="form-label fw-semibold">Họ tên <span class="text-danger">*</span></label>
+        <input asp-for="FullName" class="form-control" />
+        <span asp-validation-for="FullName" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Phone" class="form-label fw-semibold">Số điện thoại <span class="text-danger">*</span></label>
+        <input asp-for="Phone" class="form-control" />
+        <span asp-validation-for="Phone" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="LicenseNumber" class="form-label fw-semibold">Số bằng lái <span class="text-danger">*</span></label>
+        <input asp-for="LicenseNumber" class="form-control" />
+        <span asp-validation-for="LicenseNumber" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Status" class="form-label fw-semibold">Trạng thái</label>
+        <select asp-for="Status" class="form-select">
+            <option>Đang làm việc</option>
+            <option>Nghỉ</option>
+            <option>Tạm ngưng</option>
+        </select>
+    </div>
+
+    <div class="mb-4">
+        <label asp-for="Note" class="form-label fw-semibold">Ghi chú</label>
+        <textarea asp-for="Note" class="form-control" rows="2"></textarea>
+    </div>
+
+    <div class="text-end">
+        <button type="submit" class="btn btn-primary px-4">Thêm tài xế</button>
+    </div>
+</form>

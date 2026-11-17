@@ -1,0 +1,13 @@
+﻿@model HomeSectionContext
+@{
+    var s = Model.Section;
+}
+<section class="tracking-strip">
+    <div class="container">
+        <form asp-controller="Tracking" asp-action="Index" method="post" class="tracking-box">
+            @Html.AntiForgeryToken()
+            <div class="tracking-copy"><i class="bi bi-search"></i><div><strong>@s.Title</strong><small>@s.Subtitle</small></div></div>
+            <div class="tracking-input"><input name="trackingCode" class="form-control" placeholder="Ví dụ: LMS20260001" required /><button class="btn btn-primary-brand">Tra cứu ngay</button></div>
+        </form>
+    </div>
+</section>

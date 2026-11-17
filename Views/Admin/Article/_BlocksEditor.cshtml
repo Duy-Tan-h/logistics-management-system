@@ -1,0 +1,72 @@
+﻿@model List<WebVanChuyenLogicstic.Models.ArticleBlock>
+@{
+    var blocks = Model ?? new List<WebVanChuyenLogicstic.Models.ArticleBlock>();
+}
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+<div id="blocks">
+    @foreach (var b in blocks)
+    {
+        <div class="block-row bg-white p-3 rounded border mb-3">
+            <input type="hidden" data-f="Id" value="@b.Id" />
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <strong class="small text-muted block-no"></strong>
+                <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-light border" data-act="up" title="Lên"><i class="bi bi-arrow-up"></i></button>
+                    <button type="button" class="btn btn-light border" data-act="down" title="Xuống"><i class="bi bi-arrow-down"></i></button>
+                    <button type="button" class="btn btn-outline-danger" data-act="del" title="Xóa đoạn"><i class="bi bi-trash"></i></button>
+                </div>
+            </div>
+            <input type="text" class="form-control mb-2" data-f="Heading" value="@b.Heading" maxlength="250" placeholder="Tiêu đề đoạn" />
+            <textarea class="form-control" data-f="Body" rows="5" placeholder="Nội dung đoạn">@b.Body</textarea>
+        </div>
+    }
+</div>
+<button type="button" id="addBlock" class="btn btn-sm btn-outline-primary"><i class="bi bi-plus-lg me-1"></i> Thêm đoạn nội dung</button>
+<div class="form-text mt-1">Mỗi đoạn gồm tiêu đề và nội dung. Dùng mũi tên để đổi thứ tự. Đoạn để trống cả hai ô sẽ bị bỏ qua.</div>
+
+<script>
+    (function () {
+        var box = document.getElementById('blocks');
+        var form = box.closest('form');
+
+        function renumber() {
+            box.querySelectorAll('.block-row').forEach(function (row, i) {
+                row.querySelector('.block-no').textContent = 'Đoạn ' + (i + 1);
+                row.querySelectorAll('[data-f]').forEach(function (el) {
+                    el.name = 'Blocks[' + i + '].' + el.getAttribute('data-f');
+                });
+            });
+        }
+
+        function newRow() {
+            var d = document.createElement('div');
+            d.className = 'block-row bg-white p-3 rounded border mb-3';
+            d.innerHTML =
+                '<input type="hidden" data-f="Id" value="0" />' +
+                '<div class="d-flex justify-content-between align-items-center mb-2"><strong class="small text-muted block-no"></strong>' +
+                '<div class="btn-group btn-group-sm">' +
+                '<button type="button" class="btn btn-light border" data-act="up"><i class="bi bi-arrow-up"></i></button>' +
+                '<button type="button" class="btn btn-light border" data-act="down"><i class="bi bi-arrow-down"></i></button>' +
+                '<button type="button" class="btn btn-outline-danger" data-act="del"><i class="bi bi-trash"></i></button></div></div>' +
+                '<input type="text" class="form-control mb-2" data-f="Heading" maxlength="250" placeholder="Tiêu đề đoạn" />' +
+                '<textarea class="form-control" data-f="Body" rows="5" placeholder="Nội dung đoạn"></textarea>';
+            return d;
+        }
+
+        box.addEventListener('click', function (e) {
+            var btn = e.target.closest('[data-act]');
+            if (!btn) return;
+            var row = btn.closest('.block-row');
+            var act = btn.getAttribute('data-act');
+            if (act === 'del') { if (confirm('Xóa đoạn này?')) row.remove(); }
+            else if (act === 'up' && row.previousElementSibling) box.insertBefore(row, row.previousElementSibling);
+            else if (act === 'down' && row.nextElementSibling) box.insertBefore(row.nextElementSibling, row);
+            renumber();
+        });
+        document.getElementById('addBlock').addEventListener('click', function () { box.appendChild(newRow()); renumber(); });
+        form.addEventListener('submit', renumber);
+        renumber();
+    })();
+</script>

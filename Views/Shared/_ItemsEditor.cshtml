@@ -1,0 +1,119 @@
+﻿@model List<WebVanChuyenLogicstic.Models.OrderItemInput>
+@{
+    var cargoTypes = ViewBag.CargoTypes as List<CargoType> ?? new List<CargoType>();
+    var ms = ViewData.ModelState;
+    string? Err(string key) =>
+        ms.TryGetValue(key, out var e) ? e.Errors.FirstOrDefault()?.ErrorMessage : null;
+
+    async Task Row(int i, OrderItemInput it)
+    {
+        var eType = Err($"Items[{i}].CargoTypeId");
+        var eQty = Err($"Items[{i}].Quantity");
+        var eW = Err($"Items[{i}].WeightKg");
+        <div class="border rounded p-3 mb-3" data-item>
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Loại hàng <span class="text-danger">*</span></label>
+                    <select class="form-select" data-f="CargoTypeId" name="Items[@i].CargoTypeId">
+                        <option value="">— Chọn loại hàng —</option>
+                        @foreach (var c in cargoTypes)
+                        {
+                            <option value="@c.Id" data-special="@(c.IsSpecial ? "1" : "0")" selected="@(it.CargoTypeId == c.Id)">@c.Name@(c.IsSpecial ? " (đặc biệt)" : "")</option>
+                        }
+                    </select>
+                    @if (eType != null)
+                    {
+                        <div class="text-danger small">@eType</div>
+                    }
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="form-label small fw-semibold">Số lượng (kiện)</label>
+                    <input type="number" min="1" class="form-control" data-f="Quantity" name="Items[@i].Quantity" value="@it.Quantity" />
+                    @if (eQty != null)
+                    {
+                        <div class="text-danger small">@eQty</div>
+                    }
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="form-label small fw-semibold">Khối lượng (kg)</label>
+                    <input type="number" min="0.1" step="0.1" class="form-control" data-f="WeightKg" name="Items[@i].WeightKg" value="@it.WeightKg" />
+                    @if (eW != null)
+                    {
+                        <div class="text-danger small">@eW</div>
+                    }
+                </div>
+                <div class="col-md-8">
+                    <input class="form-control" data-f="Note" name="Items[@i].Note" value="@it.Note" maxlength="300" placeholder="Lưu ý (kích thước, cách bảo quản...)" />
+                </div>
+                <div class="col-8 col-md-2 d-flex align-items-center">
+                    <div class="form-check">
+                        <input type="hidden" data-f="IsFragile" name="Items[@i].IsFragile" value="false" />
+                        <input type="checkbox" class="form-check-input" id="frag-@i" data-f="IsFragile" name="Items[@i].IsFragile" value="true" checked="@it.IsFragile" />
+                        <label class="form-check-label small" for="frag-@i">Dễ vỡ / đặc biệt</label>
+                    </div>
+                </div>
+                <div class="col-4 col-md-2 text-end">
+                    <button type="button" class="btn btn-sm btn-outline-danger" data-remove>Xóa</button>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+<div id="items-box" data-max="@OrderItemInput.MaxItems">
+    @for (var i = 0; i < Model.Count; i++) { await Row(i, Model[i]); }
+</div>
+@if (Err("Items") is string eAll)
+{
+    <div class="text-danger small mb-2">@eAll</div>
+}
+<button type="button" id="item-add" class="btn btn-sm btn-outline-primary">+ Thêm dòng hàng</button>
+
+<template id="item-tpl">
+    @{
+        await Row(-1, new OrderItemInput());
+    }
+</template>
+
+<script>
+    (function () {
+        var box = document.getElementById('items-box');
+        var tpl = document.getElementById('item-tpl');
+        var max = parseInt(box.dataset.max, 10) || 10;
+
+        function reindex() {
+            box.querySelectorAll('[data-item]').forEach(function (row, k) {
+                row.querySelectorAll('[data-f]').forEach(function (el) {
+                    el.name = 'Items[' + k + '].' + el.getAttribute('data-f');
+                });
+                var cb = row.querySelector('input[type=checkbox]');
+                if (cb) { cb.id = 'frag-' + k; cb.nextElementSibling.setAttribute('for', 'frag-' + k); }
+            });
+        }
+        function changed() { box.dispatchEvent(new Event('change', { bubbles: true })); }
+
+        document.getElementById('item-add').addEventListener('click', function () {
+            if (box.querySelectorAll('[data-item]').length >= max) { alert('Tối đa ' + max + ' dòng hàng.'); return; }
+            box.appendChild(tpl.content.cloneNode(true));
+            reindex(); changed();
+        });
+        box.addEventListener('click', function (e) {
+            if (!e.target.closest('[data-remove]')) return;
+            var rows = box.querySelectorAll('[data-item]');
+            if (rows.length <= 1) { alert('Đơn cần ít nhất một dòng hàng.'); return; }
+            e.target.closest('[data-item]').remove();
+            reindex(); changed();
+        });
+        // Chọn loại hàng đặc biệt thì tự tick "dễ vỡ / đặc biệt"
+        box.addEventListener('change', function (e) {
+            if (!e.target.matches('select[data-f="CargoTypeId"]')) return;
+            var opt = e.target.options[e.target.selectedIndex];
+            var cb = e.target.closest('[data-item]').querySelector('input[type=checkbox]');
+            if (cb && opt) cb.checked = opt.getAttribute('data-special') === '1';
+        });
+        // Trước khi gửi form: đánh lại số thứ tự liên tục (bắt buộc để model binding đọc đủ danh sách)
+        var form = box.closest('form');
+        if (form) form.addEventListener('submit', reindex);
+        reindex();
+    })();
+</script>

@@ -1,0 +1,39 @@
+﻿@model HomeSectionContext
+@using Microsoft.EntityFrameworkCore
+@inject WebVanChuyenLogicstic.Data.AppDbContext Db
+@{
+    var s = Model.Section;
+    var partners = Db.MediaItems.AsNoTracking()
+        .Where(m => m.Type == MediaTypes.Partner && m.IsVisible)
+        .OrderBy(m => m.DisplayOrder).ThenBy(m => m.Id).ToList();
+}
+
+@if (partners.Any())
+{
+    <section class="section-space">
+        <div class="container">
+            <div class="section-heading text-center mx-auto">
+                <h2>@s.Title</h2>
+                @if (!string.IsNullOrEmpty(s.Subtitle))
+                {
+                    <p>@s.Subtitle</p>
+                }
+            </div>
+            <div class="row g-4 justify-content-center align-items-center mt-2">
+                @foreach (var p in partners)
+                {
+                    <div class="col-6 col-md-3 col-lg-2 text-center">
+                        @if (!string.IsNullOrEmpty(p.LinkUrl))
+                        {
+                            <a href="@p.LinkUrl" target="_blank" rel="noopener"><img src="@p.ImageUrl" alt="@p.Title" title="@p.Title" style="height:52px;max-width:100%;object-fit:contain" /></a>
+                        }
+                        else
+                        {
+                            <img src="@p.ImageUrl" alt="@p.Title" title="@p.Title" style="height:52px;max-width:100%;object-fit:contain" />
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}

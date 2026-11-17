@@ -1,0 +1,43 @@
+﻿@model WebVanChuyenLogicstic.Models.SeoPage
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Thêm SEO";
+}
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a asp-action="Index" class="btn btn-light border"><i class="bi bi-arrow-left"></i></a>
+    <h4 class="fw-bold mb-0">Thêm cấu hình SEO</h4>
+</div>
+
+<form asp-action="Create" method="post" class="card border-0 shadow-sm p-4" style="max-width:720px">
+    <div class="mb-3">
+        <label class="form-label fw-semibold">Tên trang</label>
+        <input asp-for="PageName" class="form-control" placeholder="Ví dụ: Tin tức" maxlength="100" />
+        <span asp-validation-for="PageName" class="text-danger small"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-semibold">Route</label>
+        <input asp-for="Route" class="form-control" placeholder="News/Index" maxlength="100" />
+        <div class="form-text">Dạng Controller/Action, không có dấu / ở đầu. Mỗi route chỉ có một cấu hình.</div>
+        <span asp-validation-for="Route" class="text-danger small"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-semibold">Meta Title</label>
+        <input asp-for="MetaTitle" class="form-control" maxlength="70" />
+        <span asp-validation-for="MetaTitle" class="text-danger small"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-semibold">Meta Description</label>
+        <textarea asp-for="MetaDescription" rows="3" class="form-control" maxlength="300"></textarea>
+        <span asp-validation-for="MetaDescription" class="text-danger small"></span>
+    </div>
+    <div class="mb-4">
+        <label class="form-label fw-semibold">Keywords</label>
+        <input asp-for="Keywords" class="form-control" />
+        <span asp-validation-for="Keywords" class="text-danger small"></span>
+    </div>
+    <div class="text-end">
+        <a asp-action="Index" class="btn btn-light border me-2">Hủy</a>
+        <button class="btn btn-primary px-4">Lưu</button>
+    </div>
+</form>

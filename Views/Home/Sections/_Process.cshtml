@@ -1,0 +1,43 @@
+﻿@model HomeSectionContext
+@{
+    var s = Model.Section;
+    var steps = Model.Page.ProcessSteps;
+    var (titleStart, titleEnd) = s.Title.SplitLastWords(4);
+}
+<section class="process-preview section-space">
+    <div class="container">
+        <div class="section-heading text-center mx-auto">
+            @if (!string.IsNullOrEmpty(s.Kicker))
+            {
+                <span class="section-kicker"><i class="bi bi-signpost-split"></i> @s.Kicker</span>
+            }
+            <h2>@titleStart <span class="accent-text">@titleEnd</span></h2>
+            @if (!string.IsNullOrEmpty(s.Subtitle))
+            {
+                <p>@s.Subtitle</p>
+            }
+        </div>
+
+        <ol class="process-stepper" style="--steps:@steps.Count">
+            @for (var i = 0; i < steps.Count; i++)
+            {
+                var step = steps[i];
+                <li class="process-step@(i == steps.Count - 1 ? " is-last" : "")" style="--i:@i">
+                    <div class="process-node">
+                        <i class="bi @step.Icon"></i>
+                        <b>@step.Number</b>
+                    </div>
+                    <h3>@step.Title</h3>
+                    <p>@step.Description</p>
+                </li>
+            }
+        </ol>
+
+        @if (!string.IsNullOrEmpty(s.ButtonText))
+        {
+            <div class="text-center mt-5">
+                <a href="@s.ButtonUrl" class="btn btn-accent">@s.ButtonText <i class="bi bi-arrow-right ms-1"></i></a>
+            </div>
+        }
+    </div>
+</section>

@@ -1,0 +1,36 @@
+@model WebVanChuyenLogicstic.Models.Order?
+@{
+    ViewData["Title"] = "Tra cứu đơn hàng";
+}
+<partial name="_PageHero" model='new WebVanChuyenLogicstic.Models.PageHeroViewModel("Tra cứu đơn hàng", "Theo dõi hành trình hàng hóa bằng mã đơn.", "bi-search")' />
+<section class="section-space">
+    <div class="container narrow-content">
+        <div class="content-card tracking-page">
+            <form method="post"><label>Mã đơn hàng</label><div class="tracking-input"><input name="trackingCode" value="@ViewBag.TrackingCode" class="form-control" placeholder="Ví dụ: LMS20261005-1234" required /><button class="btn btn-primary-brand">Tra cứu</button></div></form>
+            @if (ViewBag.HasResult == true)
+            {
+                if (Model is null)
+                {
+                    <div class="alert alert-warning mt-4 mb-0">Không tìm thấy đơn hàng với mã <strong>@ViewBag.TrackingCode</strong>. Vui lòng kiểm tra lại mã.</div>
+                }
+                else
+                {
+                    <div class="tracking-result">
+                        <div class="result-head"><i class="bi bi-box-seam"></i><div><small>Mã đơn hàng</small><h3>@Model.OrderCode</h3></div><span>@Model.Status</span></div>
+                        <p class="text-muted small mb-3">@(Model.Service?.Name ?? "Vận chuyển") · Tạo lúc @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+                        @if (Model.Status == OrderStatuses.Quoted)
+                        {
+                            <div class="alert alert-info py-2 small">Báo giá đã được gửi. Vui lòng kiểm tra email hoặc chờ chuyên viên liên hệ.</div>
+                        }
+                        <div class="result-route">
+                            @foreach (var ev in Model.Events.OrderBy(e => e.SequenceNumber))
+                            {
+                                <div class="@(ev.IsCompleted ? "active" : "")"><i class="bi @(ev.IsCompleted ? "bi-check" : "bi-circle")"></i><b>@ev.Title</b><small>@ev.EventAt.ToString("HH:mm dd/MM/yyyy")@(string.IsNullOrEmpty(ev.Detail) ? "" : " · " + ev.Detail)</small></div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</section>

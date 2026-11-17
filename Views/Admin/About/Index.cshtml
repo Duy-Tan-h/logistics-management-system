@@ -1,0 +1,69 @@
+﻿@model List<WebVanChuyenLogicstic.Models.AboutItem>
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Quản lý giới thiệu";
+}
+
+<h4 class="fw-bold mb-1">Quản lý trang Giới thiệu</h4>
+<p class="text-muted small mb-4">Nội dung ở đây hiện ở trang <a href="/Home/About" target="_blank">/Home/About</a>.</p>
+
+@if (TempData["SuccessMessage"] is string ok)
+{
+    <div class="alert alert-success">@ok</div>
+}
+
+@foreach (var kind in AboutKinds.Order)
+{
+    var items = Model.Where(a => a.Kind == kind).ToList();
+    var multi = AboutKinds.Multi.Contains(kind);
+    <div class="card border-0 shadow-sm p-3 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div>
+                <h6 class="fw-bold mb-0">@AboutKinds.Label(kind)</h6>
+                <div class="small text-muted">@AboutKinds.Hint(kind)</div>
+            </div>
+            @if (multi)
+            {
+                <a asp-action="Create" asp-route-kind="@kind" class="btn btn-sm btn-primary"><i class="bi bi-plus-lg me-1"></i> Thêm</a>
+            }
+        </div>
+        <table class="table table-sm align-middle mb-0">
+            <tbody>
+                @foreach (var a in items)
+                {
+                    <tr class="@(a.IsVisible ? "" : "text-muted")">
+                        <td style="width:50px">@a.DisplayOrder</td>
+                        <td style="width:110px" class="fw-semibold">@a.Value</td>
+                        <td>
+                            <div class="fw-semibold">@if (!string.IsNullOrEmpty(a.Icon)) {
+                            <i class="bi @a.Icon me-1 text-primary"></i>
+                        }
+    @a.Title</div>
+                        @if (!string.IsNullOrEmpty(a.Content))
+                        {
+                            <div class="small text-muted text-truncate" style="max-width:520px">@a.Content</div>
+                        }
+                    </td>
+                    <td style="width:80px">@if (!a.IsVisible) {
+                    <span class="badge bg-secondary-subtle text-secondary border border-secondary">Đã ẩn</span>
+                }
+</td>
+                <td class="text-end text-nowrap" style="width:140px">
+                    <a asp-action="Edit" asp-route-id="@a.Id" class="btn btn-sm btn-outline-primary">Sửa</a>
+                    @if (multi)
+                    {
+                        <form asp-action="Delete" asp-route-id="@a.Id" method="post" class="d-inline" onsubmit="return confirm('Xóa mục này?');">
+                            <button class="btn btn-sm btn-outline-danger">Xóa</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+                        }
+            @if (!items.Any())
+            {
+                <tr><td class="text-center text-muted py-3">Chưa có mục nào.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+}

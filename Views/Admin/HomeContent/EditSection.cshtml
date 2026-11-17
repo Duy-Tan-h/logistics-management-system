@@ -1,0 +1,132 @@
+﻿@model WebVanChuyenLogicstic.Models.Admin.HomeSectionEditViewModel
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Sửa khối " + Model.SectionType;
+}
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a asp-action="Index" class="btn btn-light border">← Quay lại</a>
+    <h4 class="fw-bold mb-0">Sửa khối: @Model.SectionType</h4>
+</div>
+
+@if (TempData["SuccessMessage"] is string ok)
+{
+    <div class="alert alert-success">@ok</div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <form asp-action="EditSection" asp-route-id="@Model.Id" method="post" class="card border-0 shadow-sm p-4">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="SectionType" />
+
+            <div class="mb-3">
+                <label asp-for="Kicker" class="form-label fw-semibold">Dòng nhỏ phía trên tiêu đề</label>
+                <input asp-for="Kicker" class="form-control" />
+                <span asp-validation-for="Kicker" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label fw-semibold">Tiêu đề <span class="text-danger">*</span></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Subtitle" class="form-label fw-semibold">Mô tả ngắn</label>
+                <textarea asp-for="Subtitle" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Subtitle" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Body" class="form-label fw-semibold">Nội dung thêm (chỉ khối Giới thiệu dịch vụ dùng)</label>
+                <textarea asp-for="Body" class="form-control" rows="3"></textarea>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-5">
+                    <label asp-for="ButtonText" class="form-label fw-semibold">Chữ trên nút chính</label>
+                    <input asp-for="ButtonText" class="form-control" />
+                </div>
+                <div class="col-md-7">
+                    <label asp-for="ButtonUrl" class="form-label fw-semibold">Link nút chính</label>
+                    <input asp-for="ButtonUrl" class="form-control" placeholder="/Service" />
+                    <span asp-validation-for="ButtonUrl" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-5">
+                    <label asp-for="SecondaryButtonText" class="form-label fw-semibold">Chữ trên nút phụ (Hero)</label>
+                    <input asp-for="SecondaryButtonText" class="form-control" />
+                </div>
+                <div class="col-md-7">
+                    <label asp-for="SecondaryButtonUrl" class="form-label fw-semibold">Link nút phụ</label>
+                    <input asp-for="SecondaryButtonUrl" class="form-control" placeholder="/Process" />
+                    <span asp-validation-for="SecondaryButtonUrl" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary px-4">Lưu thay đổi</button>
+            </div>
+        </form>
+    </div>
+    @if (Model.SupportsItems)
+    {
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">Các mục con <span class="text-muted fw-normal">(@Model.Items.Count)</span></h5>
+                    <a asp-action="CreateItem" asp-route-sectionId="@Model.Id" class="btn btn-sm btn-primary">+ Thêm mục</a>
+                </div>
+
+                @if (Model.Items.Count == 0)
+                {
+                    <p class="text-muted mb-0">Chưa có mục nào.</p>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @for (var i = 0; i < Model.Items.Count; i++)
+                        {
+                            var it = Model.Items[i];
+                            <li class="list-group-item px-0 d-flex align-items-center gap-2 @(it.IsVisible ? "" : "opacity-50")">
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold">
+                                        @if (!string.IsNullOrEmpty(it.Value))
+                                        {
+                                            <span class="text-primary me-1">@it.Value</span>
+                                        }
+                                        @it.Title
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(it.Description))
+                                    {
+                                        <small class="text-muted d-block">@it.Description</small>
+                                    }
+                                </div>
+                                <div class="d-inline-flex gap-1">
+                                    <form asp-action="MoveItem" asp-route-id="@it.Id" method="post">
+                                        <input type="hidden" name="direction" value="-1" />
+                                        <button class="btn btn-sm btn-outline-secondary" disabled="@(i == 0)">↑</button>
+                                    </form>
+                                    <form asp-action="MoveItem" asp-route-id="@it.Id" method="post">
+                                        <input type="hidden" name="direction" value="1" />
+                                        <button class="btn btn-sm btn-outline-secondary" disabled="@(i == Model.Items.Count - 1)">↓</button>
+                                    </form>
+                                    <form asp-action="ToggleItem" asp-route-id="@it.Id" method="post">
+                                        <button class="btn btn-sm btn-outline-warning">@(it.IsVisible ? "Ẩn" : "Hiện")</button>
+                                    </form>
+                                    <a asp-action="EditItem" asp-route-id="@it.Id" class="btn btn-sm btn-outline-primary">Sửa</a>
+                                    <form asp-action="DeleteItem" asp-route-id="@it.Id" method="post" onsubmit="return confirm('Xóa mục này?');">
+                                        <button class="btn btn-sm btn-outline-danger">Xóa</button>
+                                    </form>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    }
+</div>

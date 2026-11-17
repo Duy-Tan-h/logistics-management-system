@@ -1,0 +1,114 @@
+@model List<AboutItem>
+@{
+    ViewData["Title"] = "Giới thiệu";
+    var intro = Model.FirstOrDefault(a => a.Kind == AboutKinds.Intro);
+    var vision = Model.FirstOrDefault(a => a.Kind == AboutKinds.Vision);
+    var mission = Model.FirstOrDefault(a => a.Kind == AboutKinds.Mission);
+    var values = Model.Where(a => a.Kind == AboutKinds.CoreValue).ToList();
+    var stats = Model.Where(a => a.Kind == AboutKinds.Stat).ToList();
+    var milestones = Model.Where(a => a.Kind == AboutKinds.Milestone).ToList();
+    var paragraphs = (intro?.Content ?? "").Split(new[] { "\r\n\r\n", "\n\n" }, StringSplitOptions.RemoveEmptyEntries);
+    var vm = new[] { vision, mission }.Where(x => x != null).ToList();
+}
+<partial name="_PageHero" model='new WebVanChuyenLogicstic.Models.PageHeroViewModel("Về LMS Express", "Đơn vị logistics tận tâm, kết nối hàng hóa trên mọi miền đất nước.", "bi-buildings")' />
+
+@if (intro != null || stats.Any())
+{
+    <section class="section-space">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    @if (intro != null)
+                    {
+                        if (!string.IsNullOrEmpty(intro.Value))
+                        {
+                            <span class="section-kicker">@intro.Value</span>
+                        }
+                        <h2 class="mt-2">@intro.Title</h2>
+                        foreach (var para in paragraphs)
+                        {
+
+                            <p>@para.Trim()</p>
+                        }
+                    }
+                </div>
+                <div class="col-lg-6">
+                    @if (stats.Any())
+                    {
+                        <div class="about-numbers">
+                            @foreach (var s in stats)
+                            {
+                                <div><strong>@s.Value</strong><span>@s.Title</span></div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+@if (vm.Any())
+{
+    <section class="section-space pt-0">
+        <div class="container">
+            <div class="row g-4">
+                @foreach (var m in vm)
+                {
+                    <div class="col-md-6">
+                        <div class="content-card h-100">
+                            <div class="service-icon mb-3"><i class="bi @(m!.Icon ?? "bi-stars")"></i></div>
+                            <h3>@m.Title</h3>
+                            <p class="mb-0" style="white-space:pre-line">@m.Content</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+@if (values.Any())
+{
+    <section class="section-space pt-0">
+        <div class="container">
+            <div class="section-heading text-center mx-auto"><h2>Giá trị cốt lõi</h2></div>
+            <div class="row g-4 mt-1">
+                @foreach (var v in values)
+                {
+                    <div class="col-md-6 col-lg-3">
+                        <div class="content-card h-100 text-center">
+                            @if (!string.IsNullOrEmpty(v.Icon))
+                            {
+                                <div class="service-icon mx-auto mb-3"><i class="bi @v.Icon"></i></div>
+                            }
+                            <h5>@v.Title</h5>
+                            <p class="text-muted mb-0">@v.Content</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+@if (milestones.Any())
+{
+    <section class="section-space pt-0">
+        <div class="container">
+            <div class="section-heading text-center mx-auto"><h2>Lịch sử hình thành</h2></div>
+            <div class="mx-auto mt-3" style="max-width:760px">
+                @foreach (var m in milestones)
+                {
+                    <div class="d-flex gap-3 mb-4">
+                        <div class="fw-bold text-primary" style="min-width:70px;font-size:1.25rem">@m.Value</div>
+                        <div class="border-start ps-3 pb-2">
+                            <h5 class="mb-1">@m.Title</h5>
+                            <p class="text-muted mb-0" style="white-space:pre-line">@m.Content</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}

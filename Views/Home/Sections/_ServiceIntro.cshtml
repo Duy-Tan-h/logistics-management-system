@@ -1,0 +1,66 @@
+﻿@model HomeSectionContext
+@{
+    var s = Model.Section;
+}
+<section class="section-space section-mesh-light">
+    <div class="container">
+        @{
+            var (titleStart, titleEnd) = s.Title.SplitLastWords(4);
+        }
+        <div class="section-heading text-center mx-auto">
+            @if (!string.IsNullOrEmpty(s.Kicker))
+            {
+                <span class="section-kicker"><i class="bi bi-stars"></i> @s.Kicker</span>
+            }
+            <h2>@titleStart <span class="accent-text">@titleEnd</span></h2>
+            @if (!string.IsNullOrEmpty(s.Subtitle))
+            {
+                <p>@s.Subtitle</p>
+            }
+            @if (!string.IsNullOrEmpty(s.Body))
+            {
+                <p class="text-muted">@s.Body</p>
+            }
+        </div>
+
+        @if (Model.Page.FeaturedServices.Any())
+        {
+            var services = Model.Page.FeaturedServices;
+            <div class="row g-4 mt-3 service-grid">
+                @for (var i = 0; i < services.Count; i++)
+                {
+                    var item = services[i];
+                    <div class="col-md-4">
+                        <article class="service-card h-100 @(i == 0 ? "featured" : "")">
+                            <div class="service-media">
+                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                {
+                                    <img src="@item.ImageUrl" alt="@item.Name" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <div class="service-media-fallback"><i class="bi @item.Icon"></i></div>
+                                }
+                            </div>
+                            <div class="service-body">
+                                <span class="service-no">@((i + 1).ToString("00"))</span>
+                                <div class="service-icon"><i class="bi @item.Icon"></i></div>
+                                <h3>@item.Name</h3><p>@item.Summary</p>
+                                <div class="service-tags">
+                                    <span class="service-tag"><i class="bi bi-clock"></i> @item.DeliveryTime</span>
+                                    <span class="service-tag service-tag-price">@item.PriceNote</span>
+                                </div>
+                                <a asp-controller="Service" asp-action="Details" asp-route-id="@item.Id">Xem chi tiết <i class="bi bi-arrow-up-right"></i></a>
+                            </div>
+                        </article>
+                    </div>
+                }
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(s.ButtonText))
+        {
+            <div class="text-center mt-5"><a href="@s.ButtonUrl" class="btn btn-outline-brand">@s.ButtonText</a></div>
+        }
+    </div>
+</section>

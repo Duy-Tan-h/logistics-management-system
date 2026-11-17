@@ -1,0 +1,7 @@
+@model IReadOnlyList<ProcessStep>
+@{ ViewData["Title"] = "Quy trình vận chuyển"; }
+<partial name="_PageHero" model='new WebVanChuyenLogicstic.Models.PageHeroViewModel("Quy trình vận chuyển", "Theo dõi rõ từng bước từ lúc tạo yêu cầu đến khi giao hàng thành công.", "bi-diagram-3")' />
+<section class="section-space"><div class="container"><div class="timeline">
+@foreach (var step in Model) {
+<article class="timeline-item"><div class="timeline-number">@step.Number</div><div class="timeline-card"><div class="service-icon"><i class="bi @step.Icon"></i></div><div><span>BƯỚC @step.Number</span><h3>@step.Title</h3><p>@step.Description</p></div></div></article>
+}</div></div></section>

@@ -1,0 +1,149 @@
+@using Microsoft.EntityFrameworkCore
+@model WebVanChuyenLogicstic.Models.ContactMessage
+@inject WebVanChuyenLogicstic.Data.AppDbContext Db
+@{
+    ViewData["Title"] = "Liên hệ";
+    var site = Db.SiteSettings.AsNoTracking().FirstOrDefault() ?? new SiteSetting();
+}
+
+<!-- Tận dụng lại Component PageHero của bạn -->
+<partial name="_PageHero" model='new WebVanChuyenLogicstic.Models.PageHeroViewModel("Liên hệ với chúng tôi", "Đội ngũ LMS Express luôn sẵn sàng lắng nghe và tư vấn.", "bi-headset")' />
+
+<section class="section-space py-5">
+    <div class="container">
+
+        <!-- THÔNG BÁO TRẠNG THÁI GỬI FORM -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <div class="row g-5">
+
+            <!-- CỘT 1: THÔNG TIN LIÊN HỆ -->
+            <div class="col-lg-5">
+                <div class="content-card h-100 p-4 p-md-5 bg-light rounded-3 border-0 shadow-sm">
+                    <h3 class="fw-bold text-dark mb-4">Thông tin liên hệ</h3>
+
+                    <div class="contact-line d-flex mb-4">
+                        <div class="icon-box bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                            <i class="bi bi-geo-alt fs-5"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Trụ sở chính</h6>
+                            <p class="text-muted mb-0">@site.Address</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-line d-flex mb-4">
+                        <div class="icon-box bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                            <i class="bi bi-telephone fs-5"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Tổng đài hỗ trợ (24/7)</h6>
+                            <p class="text-muted mb-0">@site.Hotline</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-line d-flex mb-4">
+                        <div class="icon-box bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                            <i class="bi bi-envelope fs-5"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Email CSKH</h6>
+                            <p class="text-muted mb-0">@site.Email</p>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h6 class="fw-bold mb-3">Kết nối với chúng tôi</h6>
+                    <div class="d-flex gap-2">
+                        @if (!string.IsNullOrEmpty(site.FacebookUrl))
+                        {
+                            <a href="@site.FacebookUrl" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm rounded-circle" style="width:36px;height:36px;line-height:24px"><i class="bi bi-facebook"></i></a>
+                        }
+                        @* Lặp lại đúng mẫu trên cho YoutubeUrl (bi-youtube), LinkedInUrl (bi-linkedin), TikTokUrl (bi-tiktok) *@
+                        @if (!string.IsNullOrEmpty(site.ZaloUrl))
+                        {
+                            <a href="@site.ZaloUrl" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm rounded-pill px-3" style="height:36px;line-height:22px">Zalo</a>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- CỘT 2: FORM GỬI YÊU CẦU -->
+            <div class="col-lg-7">
+                <div class="p-4 p-md-5 bg-white border rounded-3 shadow-sm h-100">
+                    <h3 class="fw-bold text-dark mb-2">Gửi tin nhắn cho chúng tôi</h3>
+                    <p class="text-muted mb-4">Vui lòng điền thông tin bên dưới, nhân viên điều phối sẽ liên hệ lại với bạn trong thời gian sớm nhất.</p>
+
+                    <!-- Form sẽ gửi dữ liệu về hàm SubmitContact trong HomeController -->
+                    <form action="/Home/SubmitContact" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <input type="text" name="FullName" value="@Model?.FullName" class="form-control" placeholder="Nhập họ tên của bạn" required>
+                                <span asp-validation-for="FullName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <input type="tel" name="PhoneNumber" value="@Model?.PhoneNumber" class="form-control" placeholder="Nhập số điện thoại" required>
+                                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <input type="email" name="Email" value="@Model?.Email" class="form-control" placeholder="name@example.com" required>
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <textarea name="Message" class="form-control" rows="4" placeholder="Nhập nội dung cần tư vấn, khiếu nại hoặc báo giá..." required>@Model?.Message</textarea>
+                                <span asp-validation-for="Message" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12 mt-4">
+                                <button type="submit" class="btn btn-primary px-4 py-2 fw-medium">
+                                    <i class="bi bi-send me-2"></i> Gửi yêu cầu
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- SECTION ĐĂNG KÝ NHẬN TIN (Nằm ngay dưới Contact) -->
+<section class="py-5 bg-primary bg-opacity-10 mt-5">
+    <div class="container text-center">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <h4 class="fw-bold text-dark mb-3"><i class="bi bi-envelope-paper me-2 text-primary"></i>Đăng ký nhận bản tin</h4>
+                <p class="text-muted mb-4">Nhận ngay các thông tin khuyến mãi, bảng giá vận chuyển mới nhất và các kinh nghiệm logistics hữu ích.</p>
+
+                <!-- Form Đăng ký nhận tin -->
+                <form action="/Home/SubscribeNews" method="post" class="d-flex gap-2">
+                    @Html.AntiForgeryToken()
+                    <input type="email" name="SubscribeEmail" class="form-control form-control-lg border-primary" placeholder="Nhập địa chỉ email của bạn..." required>
+                    <button type="submit" class="btn btn-primary btn-lg px-4">Đăng ký</button>
+                </form>
+                <small class="text-muted mt-2 d-block">Chúng tôi cam kết không chia sẻ email của bạn cho bên thứ ba.</small>
+            </div>
+        </div>
+    </div>
+</section>

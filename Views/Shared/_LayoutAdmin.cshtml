@@ -1,0 +1,301 @@
+﻿@inject WebVanChuyenLogicstic.Data.AppDbContext Db
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - LMS ADMIN</title>
+    <!-- Bootstrap CSS & Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+        }
+
+        #wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        #sidebar-wrapper {
+            width: 260px;
+            background-color: #111827; /* Dark bg */
+            color: #fff;
+            flex-shrink: 0;
+            transition: all 0.25s ease;
+            position: sticky;
+            top: 0;
+            align-self: flex-start;
+            height: 100vh;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            scrollbar-width: thin;
+            scrollbar-color: #374151 transparent;
+        }
+
+            #sidebar-wrapper::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            #sidebar-wrapper::-webkit-scrollbar-thumb {
+                background-color: #374151;
+                border-radius: 3px;
+            }
+
+        .sidebar-heading {
+            padding: 1.25rem 1.5rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #f59e0b; /* Yellow accent */
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #1f2937;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+            list-style: none;
+            margin: 0;
+        }
+
+            .sidebar-nav .nav-link {
+                padding: 0.75rem 1.5rem;
+                color: #9ca3af;
+                font-size: 0.95rem;
+                display: flex;
+                align-items: center;
+                text-decoration: none;
+                transition: all 0.2s;
+            }
+
+                .sidebar-nav .nav-link:hover, .sidebar-nav .nav-link.active {
+                    color: #fff;
+                    background-color: #1f2937;
+                    border-left: 4px solid #0d6efd;
+                }
+
+        .sidebar-section-title {
+            padding: 1rem 1.5rem 0.4rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #6b7280;
+            letter-spacing: 0.05em;
+        }
+
+        #page-content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-navbar {
+            background-color: #fff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0.8rem 2rem;
+        }
+
+        .main-content {
+            padding: 2rem;
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+    @{
+        var resetPending = Db.PasswordResetRequests.Count(r => !r.IsHandled);
+        var needAction = Db.Orders.Count(o => o.Status == OrderStatuses.QuoteRequested
+        || (o.Status == OrderStatuses.Confirmed && (o.VehicleId == null || o.DriverId == null)));
+        var adminRole = Context.Session.GetString("AdminRole");
+        bool Can(params string[] roles) => adminRole == AdminRoles.SuperAdmin || roles.Contains(adminRole);
+    }
+    <div id="wrapper">
+        <!-- SIDEBAR BAR -->
+        <div id="sidebar-wrapper">
+            <div class="sidebar-heading">
+                <i class="bi bi-truck fs-4"></i> LMS ADMIN
+            </div>
+
+            <ul class="sidebar-nav">
+                <!-- BẢNG ĐIỀU KHIỂN -->
+                @if (Can())
+                {
+                    <li class="sidebar-section-title">Bảng điều khiển</li>
+                    <li>
+                        <a href="/Admin/Home" class="nav-link">
+                            <i class="bi bi-grid-1x2 me-3"></i> Tổng quan
+                        </a>
+                    </li>
+                }
+                
+
+                <!-- QUẢN LÝ VẬN HÀNH -->
+                @if (Can(AdminRoles.Dispatcher))
+                {
+                    <li class="sidebar-section-title">Quản lý vận hành</li>
+                    <li>
+                        <a href="/Admin/Order" class="nav-link">
+                            <i class="bi bi-box-seam me-3"></i> Đơn hàng
+                            @if (needAction > 0)
+                            {
+                                <span class="badge bg-warning text-dark rounded-pill ms-auto" style="font-size: 0.65rem;" title="Đơn cần xử lý">@needAction</span>
+                            }
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Admin/Vehicle" class="nav-link">
+                            <i class="bi bi-truck me-3"></i> Phương tiện
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Admin/Driver" class="nav-link">
+                            <i class="bi bi-person-badge me-3"></i> Tài xế
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Admin/Trip" class="nav-link">
+                            <i class="bi bi-signpost-split me-3"></i> Chuyến vận chuyển
+                        </a>
+                    </li>
+                    <!-- MỤC MỚI: QUẢN LÝ LIÊN HỆ -->
+                    <li>
+                        <a href="/Admin/Contact/Index" class="nav-link">
+                            <i class="bi bi-envelope-paper me-3"></i> Liên hệ & Nhận tin
+                            <span class="badge bg-danger rounded-pill ms-auto" style="font-size: 0.65rem;">Mới</span>
+                        </a>
+                    </li>
+                    
+                }
+                
+
+                <!-- QUẢN LÝ NỘI DUNG -->
+                @if (Can(AdminRoles.Editor))
+                {
+                    <li>
+                        <a href="/Admin/HomeContent/Index" class="nav-link">
+                            <i class="bi bi-layout-text-window-reverse me-3"></i> Nội dung trang chủ
+                        </a>
+                    </li>
+                    <li class="sidebar-section-title">Quản lý nội dung</li>
+                    <li>
+                        <a href="/Admin/Article/Index" class="nav-link">
+                            <i class="bi bi-journal-text me-3"></i> Bài viết / Tin tức
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Admin/Seo" class="nav-link">
+                            <i class="bi bi-search me-3"></i> SEO
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Admin/StaticPage" class="nav-link">
+                            <i class="bi bi-file-earmark-text me-3"></i> Trang tĩnh
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Admin/Process" class="nav-link">
+                            <i class="bi bi-diagram-3 me-3"></i> Quy trình vận chuyển
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Admin/About" class="nav-link">
+                            <i class="bi bi-building me-3"></i> Giới thiệu
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Admin/Media" class="nav-link">
+                            <i class="bi bi-handshake me-3"></i> Đối tác
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Admin/Media/Library" class="nav-link">
+                            <i class="bi bi-images me-3"></i> Thư viện ảnh
+                        </a>
+                    </li>
+                }
+                @if (Can())
+                {
+                    <li>
+                        <a href="/Admin/Service" class="nav-link">
+                            <i class="bi bi-tags me-3"></i> Dịch vụ & Bảng giá
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Admin/CargoType" class="nav-link">
+                            <i class="bi bi-boxes me-3"></i> Loại hàng hóa
+                        </a>
+                    </li>
+                    <!-- HỆ THỐNG -->
+                    <li class="sidebar-section-title">Hệ thống</li>
+                    <li>
+                        <a href="/Admin/Customer" class="nav-link">
+                            <i class="bi bi-people me-3"></i> Tài khoản Khách
+                            @if (resetPending > 0)
+                            {
+                                <span class="badge bg-warning text-dark rounded-pill ms-auto" style="font-size: 0.65rem;" title="Yêu cầu cấp lại mật khẩu">@resetPending</span>
+                            }
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Admin/Users" class="nav-link">
+                            <i class="bi bi-shield-lock me-3"></i> Tài khoản quản trị
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Admin/Setting" class="nav-link">
+                            <i class="bi bi-gear me-3"></i> Cấu hình
+                        </a>
+                    </li>
+                }                                           
+                
+            </ul>
+        </div>
+
+        <!-- CONTENT WRAPPER -->
+        <div id="page-content-wrapper">
+            <!-- TOP NAVBAR -->
+            <nav class="top-navbar d-flex justify-content-between align-items-center">
+                <div class="fw-medium text-secondary">
+                    @ViewData["Title"]
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <a href="/Home/Index" target="_blank" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-globe me-1"></i> Xem trang chủ
+                    </a>
+                    <div class="dropdown">
+                        <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width:32px; height:32px;">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <span class="fw-semibold small">@(Context.Session.GetString("UserName") ?? "Quản trị viên")</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="dropdownUser">
+                            @* <li><a class="dropdown-menu-item dropdown-item" href="#">Hồ sơ cá nhân</a></li> *@
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                                    <button type="submit" class="dropdown-item text-danger">Đăng xuất</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="main-content">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

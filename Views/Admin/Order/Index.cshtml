@@ -1,0 +1,83 @@
+﻿@model List<WebVanChuyenLogicstic.Models.Order>
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Đơn hàng";
+    var current = ViewBag.CurrentStatus as string;
+    var counts = (Dictionary<string, int>)ViewBag.Counts;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">Quản lý đơn hàng</h4>
+</div>
+
+@if (TempData["SuccessMessage"] is string ok)
+{
+    <div class="alert alert-success">@ok</div>
+}
+@if (TempData["ErrorMessage"] is string err)
+{
+    <div class="alert alert-danger">@err</div>
+}
+
+<form method="get" action="/Admin/Order" class="d-flex gap-2 mb-3" style="max-width:520px">
+    @if (!string.IsNullOrEmpty(current))
+    {
+        <input type="hidden" name="status" value="@current" />
+    }
+    <input name="q" value="@ViewBag.Q" class="form-control" placeholder="Mã đơn, tên khách hoặc số điện thoại" />
+    <button class="btn btn-primary">Tìm</button>
+    @if (!string.IsNullOrEmpty(ViewBag.Q as string))
+    {
+        <a href="/Admin/Order" class="btn btn-light border">Xóa lọc</a>
+    }
+</form>
+
+<ul class="nav nav-pills mb-3 gap-1">
+    <li class="nav-item"><a class="nav-link @(string.IsNullOrEmpty(current) ? "active" : "")" href="/Admin/Order">Tất cả</a></li>
+    @foreach (var s in OrderStatuses.All)
+    {
+        <li class="nav-item">
+            <a class="nav-link @(current == s ? "active" : "")" href="/Admin/Order?status=@Uri.EscapeDataString(s)">
+                @s <span class="badge bg-light text-dark ms-1">@(counts.TryGetValue(s, out var c) ? c : 0)</span>
+            </a>
+        </li>
+    }
+</ul>
+
+<div class="card border-0 shadow-sm p-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr><th>Mã đơn</th><th>Khách hàng</th><th>Tuyến</th><th>Xe / Tài xế</th><th>Trạng thái</th><th>Ngày tạo</th><th class="text-end">Thao tác</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var o in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">@o.OrderCode</td>
+                        <td>@o.CustomerName<br /><small class="text-muted">@o.Phone</small></td>
+                        <td><small>@o.PickupAddress<br />→ @o.DeliveryAddress</small></td>
+                        <td><small>@(o.Vehicle?.PlateNumber ?? "—")<br />@(o.Driver?.FullName ?? "—")</small></td>
+                        <td><span class="badge @OrderStatuses.Badge(o.Status)">@o.Status</span></td>
+                        <td><small>@o.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small></td>
+                        <td class="text-end">
+                            <a asp-action="Details" asp-route-id="@o.Id" class="btn btn-sm btn-outline-primary">Chi tiết</a>
+                            @if (o.Status == OrderStatuses.Cancelled)
+                            {
+                                <form asp-action="Delete" asp-route-id="@o.Id" method="post" class="d-inline" onsubmit="return confirm('Xóa đơn hàng này?');">
+                                    <button class="btn btn-sm btn-outline-danger">Xóa</button>
+                                </form>
+                            }
+                           
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="7" class="text-center text-muted py-4">Chưa có đơn hàng nào.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<partial name="_Pager" model="Model" />

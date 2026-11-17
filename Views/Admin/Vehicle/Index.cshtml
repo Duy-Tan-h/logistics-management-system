@@ -1,0 +1,59 @@
+﻿@model List<WebVanChuyenLogicstic.Models.Vehicle>
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Phương tiện";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">Quản lý phương tiện</h4>
+    <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> Thêm phương tiện</a>
+</div>
+
+@if (TempData["SuccessMessage"] is string ok)
+{
+    <div class="alert alert-success">@ok</div>
+}
+@if (TempData["ErrorMessage"] is string err)
+{
+    <div class="alert alert-danger">@err</div>
+}
+
+<div class="card border-0 shadow-sm p-3">
+    <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+            <tr><th>Biển số</th><th>Loại xe</th><th>Tải trọng</th><th>Trạng thái</th><th class="text-end">Thao tác</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var v in Model)
+            {
+                <tr>
+                    <td class="fw-semibold">@v.PlateNumber</td>
+                    <td>@v.VehicleType</td>
+                    <td>@(v.CapacityKg is null ? "—" : $"{v.CapacityKg:n0} kg")</td>
+                    <td>
+                        @{
+                            var badge = v.Status switch
+                            {
+                                "Đang hoạt động" => "success",
+                                "Bảo trì" => "warning",
+                                _ => "secondary"
+                            };
+                        }
+                        <span class="badge bg-@badge-subtle text-@badge border border-@badge">@v.Status</span>
+                    </td>
+                    <td class="text-end">
+                        <a asp-action="Edit" asp-route-id="@v.Id" class="btn btn-sm btn-outline-primary">Sửa</a>
+                        <form asp-action="Delete" asp-route-id="@v.Id" method="post" class="d-inline" onsubmit="return confirm('Xóa phương tiện này?');">
+                            <button class="btn btn-sm btn-outline-danger">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            @if (!Model.Any())
+            {
+                <tr><td colspan="5" class="text-center text-muted py-4">Chưa có phương tiện nào.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+<partial name="_Pager" model="Model" />

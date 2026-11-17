@@ -1,0 +1,81 @@
+﻿@model WebVanChuyenLogicstic.Models.Trip
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Chuyến " + Model.Route;
+    var total = Model.Orders.Sum(l => l.Order?.WeightKg ?? 0);
+}
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a asp-action="Index" class="btn btn-light border"><i class="bi bi-arrow-left"></i></a>
+    <h4 class="fw-bold mb-0">@Model.Route</h4>
+    <span class="badge bg-secondary-subtle text-dark border fs-6">@Model.Status</span>
+</div>
+
+@if (TempData["SuccessMessage"] is string ok)
+{
+    <div class="alert alert-success">@ok</div>
+}
+@if (TempData["ErrorMessage"] is string err)
+{
+    <div class="alert alert-danger">@err</div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm p-4 mb-4">
+            <h6 class="fw-bold mb-3">Thông tin chuyến</h6>
+            <dl class="row mb-0">
+                <dt class="col-sm-4">Xe</dt>
+                <dd class="col-sm-8">@Model.Vehicle?.PlateNumber (@Model.Vehicle?.VehicleType, tải trọng @(Model.Vehicle?.CapacityKg?.ToString("n0") ?? "?") kg)</dd>
+                <dt class="col-sm-4">Tài xế</dt>
+                <dd class="col-sm-8">@Model.Driver?.FullName · @Model.Driver?.Phone</dd>
+                <dt class="col-sm-4">Dự kiến khởi hành</dt>
+                <dd class="col-sm-8">@(Model.DepartAt?.ToString("dd/MM/yyyy HH:mm") ?? "—")</dd>
+                <dt class="col-sm-4">Tổng khối lượng</dt>
+                <dd class="col-sm-8">@total.ToString("n1") kg</dd>
+                <dt class="col-sm-4">Ghi chú</dt>
+                <dd class="col-sm-8">@(Model.Note ?? "—")</dd>
+            </dl>
+        </div>
+
+        <div class="card border-0 shadow-sm p-4">
+            <h6 class="fw-bold mb-3">Đơn hàng trong chuyến (@Model.Orders.Count)</h6>
+            <table class="table table-sm align-middle mb-0">
+                <thead><tr><th>Mã đơn</th><th>Lấy → Giao</th><th class="text-end">Kg</th><th>Trạng thái</th></tr></thead>
+                <tbody>
+                    @foreach (var l in Model.Orders)
+                    {
+                        <tr>
+                            <td><a asp-controller="Order" asp-action="Details" asp-route-id="@l.OrderId">@l.Order?.OrderCode</a></td>
+                            <td class="small">@l.Order?.PickupAddress → @l.Order?.DeliveryAddress</td>
+                            <td class="text-end">@(l.Order?.WeightKg?.ToString("n1") ?? "—")</td>
+                            <td>@l.Order?.Status</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm p-4">
+            <h6 class="fw-bold mb-3">Thao tác</h6>
+            @if (Model.Status == TripStatuses.Planned)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary w-100 mb-2">Sửa chuyến (xe, tài xế, đơn)</a>
+            }
+            @foreach (var s in TripStatuses.Next(Model.Status))
+            {
+                <form asp-action="SetStatus" asp-route-id="@Model.Id" method="post" class="mb-2"
+                      onsubmit="return confirm('Chuyển chuyến sang @s?');">
+                    <input type="hidden" name="status" value="@s" />
+                    <button class="btn @(s == TripStatuses.Cancelled ? "btn-outline-danger" : "btn-primary") w-100">@s</button>
+                </form>
+            }
+            @if (!TripStatuses.Next(Model.Status).Any())
+            {
+                <div class="small text-muted">Chuyến đã kết thúc.</div>
+            }
+        </div>
+    </div>
+</div>

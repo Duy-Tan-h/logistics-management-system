@@ -1,0 +1,142 @@
+﻿@model WebVanChuyenLogicstic.Models.Article
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Thêm Bài viết mới";
+}
+
+<style>
+    .admin-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        border: 1px solid #f3f4f6;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.9rem;
+    }
+
+    .form-control, .form-select {
+        border-color: #d1d5db;
+        padding: 0.6rem 1rem;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13,110,253,.1);
+        }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center gap-3">
+        <a asp-action="Index" class="btn btn-light border text-muted px-3"><i class="bi bi-arrow-left"></i> Quay lại</a>
+        <div><h4 class="fw-bold mb-0">Thêm Bài viết mới</h4></div>
+    </div>
+</div>
+
+<form asp-controller="Article" asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="admin-card p-4 mb-4">
+                <h5 class="fw-bold mb-4 border-bottom pb-2">Nội dung bài viết</h5>
+
+                <div class="mb-4">
+                    <label asp-for="Title" class="form-label">Tiêu đề bài viết <span class="text-danger">*</span></label>
+                    <input asp-for="Title" class="form-control form-control-lg fs-6" placeholder="Nhập tiêu đề hấp dẫn cho bài viết..." required>
+                    <span asp-validation-for="Title" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Summary" class="form-label">Đoạn tóm tắt (Summary) <span class="text-danger">*</span></label>
+                    <textarea asp-for="Summary" class="form-control" rows="3" placeholder="Viết 1-2 câu tóm tắt nội dung chính để hiển thị ngoài trang chủ..." required></textarea>
+                    <span asp-validation-for="Summary" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ImageUrl" class="form-label">Đường dẫn ảnh đại diện (không bắt buộc)</label>
+                    <input asp-for="ImageUrl" class="form-control" placeholder="/images/News/ten-anh.jpg">
+                    <div class="form-text">Để trống thì trang chủ sẽ hiện icon + màu nền thay cho ảnh.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Nội dung chi tiết (các đoạn)</label>
+                    <partial name="~/Views/Admin/Article/_BlocksEditor.cshtml" model="Model.Blocks" />
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="admin-card p-4 mb-4">
+                <h6 class="fw-bold mb-3">Xuất bản</h6>
+
+                <div class="mb-3">
+                    <label class="form-label">Ngày đăng</label>
+                    <input type="date" name="PublishedAt" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                </div>
+
+                <div class="form-check form-switch mb-3">
+                    <input asp-for="IsPublished" class="form-check-input">
+                    <label asp-for="IsPublished" class="form-check-label">Xuất bản ngay</label>
+                </div>
+
+                <hr class="my-3">
+
+                <div class="form-check form-switch mb-2">
+                    <input asp-for="IsFeatured" class="form-check-input">
+                    <label asp-for="IsFeatured" class="form-check-label">Hiện ở trang chủ (Nổi bật)</label>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="FeaturedOrder" class="form-label">Thứ tự hiện ở trang chủ</label>
+                    <input asp-for="FeaturedOrder" type="number" class="form-control" value="0">
+                    <div class="form-text">Số nhỏ hiện trước. Chỉ có ý nghĩa khi đã tích "Nổi bật".</div>
+                </div>
+
+                <hr class="my-3">
+                <button type="submit" class="btn btn-primary w-100 fw-medium"><i class="bi bi-send me-1"></i> Xuất bản bài viết</button>
+            </div>
+
+            <div class="admin-card p-4 mb-4">
+                <h6 class="fw-bold mb-3">Phân loại & Hiển thị</h6>
+                <div class="mb-3">
+                    <label asp-for="Category" class="form-label">Chuyên mục <span class="text-danger">*</span></label>
+                    <select asp-for="Category" class="form-select" required>
+                        <option value="">-- Chọn chuyên mục --</option>
+                        @foreach (var c in ArticleCategories.All)
+                        {
+                            <option value="@c">@c</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Category" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Icon" class="form-label">Biểu tượng (Bootstrap Icon)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-star"></i></span>
+                        <input asp-for="Icon" class="form-control" placeholder="VD: bi-truck, bi-box-seam...">
+                    </div>
+                    <div class="form-text"><a href="https://icons.getbootstrap.com/" target="_blank" class="text-decoration-none">Tra cứu tên Icon tại đây</a></div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ArtClass" class="form-label">Màu sắc nhận diện (Class)</label>
+                    <select asp-for="ArtClass" class="form-select">
+                        <option value="art-one">Kiểu 1 (art-one)</option>
+                        <option value="art-two">Kiểu 2 (art-two)</option>
+                        <option value="art-three">Kiểu 3 (art-three)</option>
+                        <option value="art-four">Kiểu 4 (art-four)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

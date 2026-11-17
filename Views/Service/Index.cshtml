@@ -1,0 +1,43 @@
+@model IReadOnlyList<TransportService>
+@{
+    ViewData["Title"] = "Dịch vụ vận chuyển";
+}
+<partial name="_PageHero" model='new WebVanChuyenLogicstic.Models.PageHeroViewModel("Dịch vụ vận chuyển", "Giải pháp linh hoạt, tối ưu cho mọi loại hàng hóa và hành trình.", "bi-truck")' />
+<section class="section-space">
+    <div class="container">
+        @if (!Model.Any())
+        {
+            <p class="text-center text-muted">Hiện chưa có dịch vụ nào. Vui lòng quay lại sau hoặc <a asp-controller="Home" asp-action="Contact">liên hệ</a> với chúng tôi.</p>
+        }
+        <div class="row g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <article class="service-card h-100">
+                        <div class="service-media">
+                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                            {
+                                <img src="@item.ImageUrl" alt="@item.Name" loading="lazy" />
+                            }
+                            else
+                            {
+                                <div class="service-media-fallback"><i class="bi @item.Icon"></i></div>
+                            }
+                        </div>
+                        <div class="service-body">
+                            <div class="service-icon"><i class="bi @item.Icon"></i></div>
+                            <h3>@item.Name</h3>
+                            <p>@item.Summary</p>
+                            <div class="service-tags">
+                                <span class="service-tag"><i class="bi bi-clock"></i> @item.DeliveryTime</span>
+                                <span class="service-tag service-tag-price">@item.PriceNote</span>
+                            </div>
+                            <a asp-action="Details" asp-route-id="@item.Id">Xem chi tiết <i class="bi bi-arrow-up-right"></i></a>
+                        </div>
+                    </article>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+<partial name="_BottomCta" />

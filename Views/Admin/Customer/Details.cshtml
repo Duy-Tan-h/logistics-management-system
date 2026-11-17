@@ -1,0 +1,91 @@
+﻿@model WebVanChuyenLogicstic.Models.Admin.CustomerDetailViewModel
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    var c = Model.Customer;
+    ViewData["Title"] = c.FullName;
+}
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a href="/Admin/Customer" class="btn btn-light border"><i class="bi bi-arrow-left"></i></a>
+    <h4 class="fw-bold mb-0">@c.FullName</h4>
+</div>
+
+@if (TempData["SuccessMessage"] is string ok)
+{
+    <div class="alert alert-success">@ok</div>
+}
+@if (TempData["ErrorMessage"] is string err)
+{
+    <div class="alert alert-danger">@err</div>
+}
+@if (ViewBag.PendingReset == true)
+{
+    <div class="alert alert-warning"><i class="bi bi-key me-1"></i> Khách này đang chờ cấp lại mật khẩu. Bấm "Đặt lại mật khẩu" bên dưới để xử lý.</div>
+}
+@if (TempData["TempPassword"] is string temp)
+{
+    <div class="alert alert-warning">
+        Mật khẩu tạm: <code class="fs-5 user-select-all">@temp</code><br />
+        <small>Chỉ hiện một lần. Hãy gửi cho khách qua kênh riêng (điện thoại) và nhắc khách đổi lại.</small>
+    </div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm p-4 mb-4">
+            <h6 class="fw-bold mb-3">Thông tin</h6>
+            <dl class="mb-0">
+                <dt>Email</dt>
+                <dd>@c.Email</dd>
+                <dt>Điện thoại</dt>
+                <dd>@c.Phone</dd>
+                <dt>Số đơn</dt>
+                <dd class="mb-0">@Model.Orders.Count</dd>
+            </dl>
+        </div>
+
+        <div class="card border-0 shadow-sm p-4">
+            <h6 class="fw-bold mb-3">Thao tác</h6>
+            <form asp-action="ResetPassword" asp-route-id="@c.Id" method="post" class="mb-2"
+                  onsubmit="return confirm('Đặt lại mật khẩu cho khách này? Mật khẩu cũ sẽ không dùng được nữa.');">
+                <button class="btn btn-outline-primary w-100">Đặt lại mật khẩu</button>
+            </form>
+            <form asp-action="ToggleActive" asp-route-id="@c.Id" method="post" class="mb-2"
+                  onsubmit="return confirm('@(c.IsActive ? "Khóa tài khoản này? Khách sẽ không đăng nhập được." : "Mở khóa tài khoản này?")');">
+                <button class="btn @(c.IsActive ? "btn-outline-warning" : "btn-outline-success") w-100">@(c.IsActive ? "Khóa tài khoản" : "Mở khóa tài khoản")</button>
+            </form>
+            <form asp-action="Delete" asp-route-id="@c.Id" method="post"
+                  onsubmit="return confirm('Xóa tài khoản này? Các đơn hàng vẫn được giữ lại.');">
+                <button class="btn btn-outline-danger w-100">Xóa tài khoản</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm p-4">
+            <h6 class="fw-bold mb-3">Đơn hàng của khách</h6>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="table-light"><tr><th>Mã đơn</th><th>Tuyến</th><th>Trạng thái</th><th>Ngày tạo</th><th></th></tr></thead>
+                    <tbody>
+                        @foreach (var o in Model.Orders)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@o.OrderCode</td>
+                                <td><small>@o.PickupAddress<br />→ @o.DeliveryAddress</small></td>
+                                <td><span class="badge @OrderStatuses.Badge(o.Status)">@o.Status</span></td>
+                                <td><small>@o.CreatedAt.ToString("dd/MM/yyyy")</small></td>
+                                <td class="text-end"><a href="/Admin/Order/Details/@o.Id" class="btn btn-sm btn-outline-primary">Mở</a></td>
+                            </tr>
+                        }
+                        @if (!Model.Orders.Any())
+                        {
+                            <tr><td colspan="5" class="text-center text-muted py-3">Khách chưa có đơn nào gắn với tài khoản.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <small class="text-muted mt-3">Đơn khách gửi lúc chưa đăng nhập không nằm trong danh sách này.</small>
+        </div>
+    </div>
+</div>

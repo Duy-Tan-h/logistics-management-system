@@ -1,0 +1,30 @@
+﻿@model HomeSectionContext
+@using Microsoft.EntityFrameworkCore
+@inject WebVanChuyenLogicstic.Data.AppDbContext Db
+@{
+    var banners = Db.MediaItems.AsNoTracking()
+        .Where(m => m.Type == MediaTypes.Banner && m.IsVisible)
+        .OrderBy(m => m.DisplayOrder).ThenBy(m => m.Id).ToList();
+}
+@if (banners.Any())
+{
+    <section class="py-4">
+        <div class="container">
+            <div class="row g-3">
+                @foreach (var b in banners)
+                {
+                    <div class="@(banners.Count == 1 ? "col-12" : "col-md-6")">
+                        @if (!string.IsNullOrEmpty(b.LinkUrl))
+                        {
+                            <a href="@b.LinkUrl"><img src="@b.ImageUrl" alt="@b.Title" class="w-100 rounded-3 shadow-sm" style="max-height:260px;object-fit:cover" /></a>
+                        }
+                        else
+                        {
+                            <img src="@b.ImageUrl" alt="@b.Title" class="w-100 rounded-3 shadow-sm" style="max-height:260px;object-fit:cover" />
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}

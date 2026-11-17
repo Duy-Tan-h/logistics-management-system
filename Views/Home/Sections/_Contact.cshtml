@@ -1,0 +1,82 @@
+﻿@model HomeSectionContext
+@{
+    var s = Model.Section;
+    var (titleStart, titleEnd) = s.Title.SplitLastWords(6);
+}
+<section class="section-space section-mesh-light">
+    <div class="container">
+        <div class="section-heading text-center mx-auto">
+            @if (!string.IsNullOrEmpty(s.Kicker))
+            {
+                <span class="section-kicker"><i class="bi bi-headset"></i> @s.Kicker</span>
+            }
+            <h2>@titleStart <span class="accent-text">@titleEnd</span></h2>
+            @if (!string.IsNullOrEmpty(s.Subtitle))
+            {
+                <p>@s.Subtitle</p>
+            }
+        </div>
+
+        <div class="contact-shell mt-3">
+            <div class="contact-info">
+                <div class="contact-info-decor"></div>
+                <h3>Thông tin liên hệ</h3>
+                <p class="contact-info-lead">Đội ngũ LMS Express luôn sẵn sàng hỗ trợ bạn 24/7.</p>
+
+                <div class="contact-line-list">
+                    @foreach (var item in s.Items)
+                    {
+                        <div class="contact-line-glass">
+                            @if (!string.IsNullOrEmpty(item.Icon))
+                            {
+                                <span class="contact-line-icon"><i class="bi @item.Icon"></i></span>
+                            }
+                            <div>
+                                <h6>@item.Title</h6>
+                                <p>@item.Description</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="contact-social">
+                    <a href="#"><i class="bi bi-facebook"></i></a>
+                    <a href="#"><i class="bi bi-youtube"></i></a>
+                    <a href="#"><i class="bi bi-linkedin"></i></a>
+                </div>
+            </div>
+
+            <div class="contact-form-panel">
+                <h3>Gửi yêu cầu cho chúng tôi</h3>
+                <p class="text-muted mb-4">Điền thông tin bên dưới, nhân viên điều phối sẽ liên hệ lại trong thời gian sớm nhất.</p>
+
+                <form asp-controller="Home" asp-action="SubmitContact" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Họ và tên</label>
+                            <input type="text" name="FullName" class="form-control" placeholder="Nhập họ tên của bạn" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Số điện thoại</label>
+                            <input type="tel" name="PhoneNumber" class="form-control" placeholder="Nhập số điện thoại" required />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-medium">Email</label>
+                            <input type="email" name="Email" class="form-control" placeholder="name@example.com" required />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-medium">Nội dung</label>
+                            <textarea name="Message" class="form-control" rows="4" placeholder="Nhập nội dung cần tư vấn hoặc báo giá..." required></textarea>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="contact-submit-btn">
+                                Gửi yêu cầu <i class="bi bi-send ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

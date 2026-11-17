@@ -1,0 +1,86 @@
+﻿@model List<WebVanChuyenLogicstic.Models.TransportService>
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Dịch vụ vận chuyển";
+    var counts = ViewBag.OrderCounts as Dictionary<int, int> ?? new Dictionary<int, int>();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">Quản lý dịch vụ vận chuyển</h4>
+    <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> Thêm dịch vụ</a>
+</div>
+
+@if (TempData["SuccessMessage"] is string ok)
+{
+    <div class="alert alert-success">@ok</div>
+}
+@if (TempData["ErrorMessage"] is string err)
+{
+    <div class="alert alert-danger">@err</div>
+}
+
+<div class="card border-0 shadow-sm p-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr><th style="width:70px">Ảnh</th><th>Dịch vụ</th><th>Thời gian / Chi phí</th><th>Trang chủ</th><th>Hiển thị</th><th class="text-center">Số đơn</th><th class="text-end">Thao tác</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Model)
+                {
+                    <tr class="@(s.IsVisible ? "" : "text-muted")">
+                        <td>
+                            @if (!string.IsNullOrEmpty(s.ImageUrl))
+                            {
+                                <img src="@s.ImageUrl" alt="" style="width:56px;height:40px;object-fit:cover;border-radius:6px" />
+                            }
+                            else
+                            {
+                                <span class="text-primary fs-4"><i class="bi @s.Icon"></i></span>
+                            }
+                        </td>
+                        <td><div class="fw-semibold">@s.Name</div><div class="small text-muted">@s.Summary</div></td>
+                        <td class="small">@s.DeliveryTime<br />@s.PriceNote</td>
+                        <td>
+                            @if (s.IsFeatured)
+                            {
+                                <span class="badge bg-warning-subtle text-warning border border-warning">Nổi bật #@s.FeaturedOrder</span>
+                            }
+                            else
+                            {
+
+                                <span class="text-muted small">—</span>
+                            }
+                        </td>
+                        <td>
+                            @if (s.IsVisible)
+                            {
+                                <span class="badge bg-success-subtle text-success border border-success">Đang hiện</span>
+                            }
+                            else
+                            {
+
+                                <span class="badge bg-secondary-subtle text-secondary border border-secondary">Đã ẩn</span>
+                            }
+                        </td>
+                        <td class="text-center">@(counts.TryGetValue(s.Id, out var n) ? n : 0)</td>
+                        <td class="text-end text-nowrap">
+                            <a asp-action="Edit" asp-route-id="@s.Id" class="btn btn-sm btn-outline-primary">Sửa</a>
+                            <form asp-action="Toggle" asp-route-id="@s.Id" method="post" class="d-inline">
+                                <button class="btn btn-sm btn-outline-secondary">@(s.IsVisible ? "Ẩn" : "Hiện")</button>
+                            </form>
+                            <form asp-action="Delete" asp-route-id="@s.Id" method="post" class="d-inline" onsubmit="return confirm('Xóa dịch vụ này?');">
+                                <button class="btn btn-sm btn-outline-danger">Xóa</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="7" class="text-center text-muted py-4">Chưa có dịch vụ nào.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<partial name="_Pager" model="Model" />

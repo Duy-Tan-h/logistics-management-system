@@ -1,0 +1,255 @@
+﻿@model WebVanChuyenLogicstic.Models.Order
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Đơn " + Model.OrderCode;
+    
+    var isFinal = OrderStatuses.IsFinal(Model.Status);
+    var isClosed = Model.IsClosed;
+    var inQuoteStage = Model.Status == OrderStatuses.QuoteRequested || Model.Status == OrderStatuses.Quoted;
+    //var targets = OrderStatuses.Next(Model.Status).Where(s => s != OrderStatuses.Quoted && s != OrderStatuses.Confirmed).ToList();
+    var defaultValid = (Model.QuoteValidUntil ?? DateTime.Today.AddDays(7)).ToString("yyyy-MM-dd");
+}
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a asp-action="Index" class="btn btn-light border"><i class="bi bi-arrow-left"></i></a>
+    <h4 class="fw-bold mb-0">Đơn @Model.OrderCode</h4>
+    <span class="badge @OrderStatuses.Badge(Model.Status) fs-6">@Model.Status</span>
+</div>
+
+@if (TempData["SuccessMessage"] is string ok)
+{
+    <div class="alert alert-success">@ok</div>
+}
+@if (TempData["ErrorMessage"] is string err)
+{
+    <div class="alert alert-danger">@err</div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0">Thông tin đơn hàng</h6>
+                @if (Model.Status is OrderStatuses.QuoteRequested or OrderStatuses.Quoted or OrderStatuses.Confirmed)
+                {
+                    <a asp-action="EditInfo" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil me-1"></i>Sửa thông tin</a>
+                }
+            </div>
+            <dl class="row mb-0">
+                <dt class="col-sm-4">Khách hàng</dt>               
+                <dd class="col-sm-8">@Model.CustomerName · @Model.Phone@(string.IsNullOrEmpty(Model.Email) ? " · (không có email)" : " · " + Model.Email)</dd>
+                <dt class="col-sm-4">Người nhận</dt>
+                <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.ReceiverName) ? "—" : Model.ReceiverName + " · " + Model.ReceiverPhone)</dd>
+                <dt class="col-sm-4">Dịch vụ</dt>
+                <dd class="col-sm-8">@(Model.Service?.Name ?? "—")</dd>
+                <dt class="col-sm-4">Lấy hàng</dt>
+                <dd class="col-sm-8">@Model.PickupAddress</dd>
+                <dt class="col-sm-4">Giao hàng</dt>
+                <dd class="col-sm-8">@Model.DeliveryAddress</dd>
+                <dt class="col-sm-4">Hàng hóa</dt>
+                <dd class="col-sm-8">
+                    @if (Model.Items.Any())
+                    {
+                        <table class="table table-sm mb-0">
+                            <thead><tr><th>Loại hàng</th><th class="text-end">SL</th><th class="text-end">Kg</th><th>Lưu ý</th></tr></thead>
+                            <tbody>
+                                @foreach (var it in Model.Items.OrderBy(i => i.Id))
+                                {
+                                    <tr>
+                                        <td>@it.CargoTypeName@if (it.IsFragile) {
+                                        <span class="badge bg-warning-subtle text-warning border border-warning ms-1">Dễ vỡ</span>
+                                    }
+    </td>
+                                    <td class="text-end">@it.Quantity</td>
+                                    <td class="text-end">@(it.WeightKg?.ToString("n1") ?? "—")</td>
+                                    <td>@(it.Note ?? "")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                                        }
+                                        else
+                    {
+                        @(Model.CargoType ?? "—")
+                    }
+                </dd>
+                <dt class="col-sm-4">Ngày dự kiến gửi</dt>
+                <dd class="col-sm-8">@(Model.ExpectedShipDate?.ToString("dd/MM/yyyy") ?? "—")</dd>
+                <dt class="col-sm-4">Ghi chú</dt>
+                <dd class="col-sm-8">@(Model.Note ?? "—")</dd>
+                <dt class="col-sm-4">Ngày tạo</dt>
+                <dd class="col-sm-8">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+                @if (Model.QuotedPrice != null)
+                {
+                    <dt class="col-sm-4">Giá đã báo</dt>
+                    <dd class="col-sm-8 fw-bold">@OrderFormat.Money(Model.QuotedPrice)</dd>
+                }
+            </dl>
+        </div>
+
+        <div class="card border-0 shadow-sm p-4">
+            <h6 class="fw-bold mb-3">Dòng thời gian</h6>
+            @foreach (var ev in Model.Events.OrderByDescending(e => e.SequenceNumber))
+            {
+                <div class="d-flex gap-3 mb-3">
+                    <i class="bi @(ev.IsCompleted ? "bi-check-circle-fill text-success" : "bi-circle text-muted") mt-1"></i>
+                    <div>
+                        <div class="fw-semibold">@ev.Title</div>
+                        @if (!string.IsNullOrEmpty(ev.Detail))
+                        {
+                            <div class="small text-muted">@ev.Detail</div>
+                        }
+                        <details class="small">
+                            <summary class="text-primary" style="cursor:pointer">Sửa ghi chú</summary>
+                            <form asp-action="EditEvent" asp-route-id="@Model.Id" method="post" class="d-flex gap-2 mt-1">
+                                <input type="hidden" name="eventId" value="@ev.Id" />
+                                <input name="detail" value="@ev.Detail" maxlength="500" class="form-control form-control-sm" />
+                                <button class="btn btn-sm btn-outline-primary">Lưu</button>
+                            </form>
+                        </details>
+                        <div class="small text-muted">@ev.EventAt.ToString("dd/MM/yyyy HH:mm")</div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+
+        @if (inQuoteStage)
+        {
+            <div class="card border-0 shadow-sm p-4 mb-4">
+                <h6 class="fw-bold mb-3">Báo giá cho khách</h6>
+
+                @if (Model.Status == OrderStatuses.Quoted)
+                {
+                    <div class="mb-3 p-3 bg-light rounded">
+                        <div class="fs-5 fw-bold">@OrderFormat.Money(Model.QuotedPrice)</div>
+                        <div class="small text-muted">
+                            Hiệu lực đến hết ngày @(Model.QuoteValidUntil?.ToString("dd/MM/yyyy"))
+                            @if (Model.QuoteExpired)
+                            {
+                                <span class="badge bg-danger ms-1">Đã hết hạn</span>
+                            }
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.QuoteNote))
+                        {
+                            <div class="small mt-1">@Model.QuoteNote</div>
+                        }
+                    </div>
+
+                    <p class="small text-muted">Khách đồng ý qua email thì đơn tự cập nhật. Nếu khách đồng ý hoặc từ chối qua điện thoại, bấm nút tương ứng:</p>
+                    <div class="d-grid gap-2 mb-3">
+                        <form asp-action="CustomerAccepted" asp-route-id="@Model.Id" method="post">
+                            <button class="btn btn-success w-100">Khách đã đồng ý (xác nhận đơn)</button>
+                        </form>
+                        <form asp-action="CustomerDeclined" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Hủy đơn vì khách từ chối báo giá?');">
+                            <button class="btn btn-outline-danger w-100">Khách từ chối báo giá</button>
+                        </form>
+                    </div>
+                    <hr />
+                    <div class="small fw-semibold mb-2">Báo giá lại (link cũ trong email sẽ hết hiệu lực)</div>
+                }
+                else
+                {
+                    <p class="small text-muted">
+                        @if (string.IsNullOrEmpty(Model.Email))
+                        {
+                            <text>Khách không để lại email. Sau khi lưu, hãy gọi <strong>@Model.Phone</strong> để báo giá.</text>
+                        }
+                        else
+                        {
+                            <text>Khách sẽ nhận email kèm giá và nút đồng ý.</text>
+                        }
+                    </p>
+                }
+
+                <form asp-action="SendQuote" asp-route-id="@Model.Id" method="post">
+                    <label class="form-label small fw-semibold">Giá báo (VNĐ)</label>
+                    <input name="price" type="number" min="1000" step="1000" class="form-control mb-2" value="@(Model.QuotedPrice?.ToString("0"))" required />
+                    <label class="form-label small fw-semibold">Hiệu lực đến hết ngày</label>
+                    <input name="validUntil" type="date" class="form-control mb-2" value="@defaultValid" min="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+                    <label class="form-label small fw-semibold">Ghi chú về giá</label>
+                    <textarea name="note" rows="2" maxlength="1000" class="form-control mb-3" placeholder="Ví dụ: đã gồm phí cầu đường, chưa gồm bốc xếp">@Model.QuoteNote</textarea>
+                    <button class="btn btn-primary w-100">@(Model.Status == OrderStatuses.Quoted ? "Gửi báo giá mới" : "Gửi báo giá")</button>
+                </form>
+            </div>
+        }
+
+        @if (!isClosed)
+        {
+            <div class="card border-0 shadow-sm p-4 mb-4">
+                @if (inQuoteStage || Model.Status == OrderStatuses.Confirmed)
+                {
+                    <h6 class="fw-bold mb-3">Hủy đơn</h6>
+                    <form asp-action="UpdateStatus" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Hủy đơn hàng này?');">
+                        <input type="hidden" name="status" value="@OrderStatuses.Cancelled" />
+                        <input name="detail" class="form-control mb-2" placeholder="Lý do hủy (bắt buộc)" maxlength="500" required/>
+                        <button class="btn btn-outline-danger w-100">Hủy đơn</button>
+                    </form>
+                    if (Model.Status == OrderStatuses.Confirmed)
+                    {
+                        <div class="small text-muted mt-2">Đơn sẽ tự chuyển sang "Đang vận chuyển" khi chuyến chứa đơn được chuyển sang "Đang chạy". Sau đó không thể hủy.</div>
+                    }
+                }
+                else
+                {
+                     var nextMilestone = OrderMilestones.Next(Model.CurrentMilestone);
+                    <h6 class="fw-bold mb-3">Cập nhật tiến độ</h6>
+                    <div class="small text-muted mb-2">
+                        Mốc hiện tại: <strong>@(Model.CurrentMilestone ?? "Đã xác nhận")</strong>
+                    </div>
+                    if (nextMilestone != null && OrderMilestones.IsTripDriven(nextMilestone))
+                    {
+                        <div class="alert alert-secondary small mb-0">Mốc tiếp theo "@nextMilestone" sẽ tự cập nhật khi chuyến vận chuyển hoàn thành.</div>
+                        
+                    }
+                    else if (nextMilestone != null)
+                    {
+                        <form asp-action="AddMilestone" asp-route-id="@Model.Id" method="post" class="mb-3">
+                            <input type="hidden" name="milestone" value="@nextMilestone" />
+                            <input name="detail" class="form-control mb-2" placeholder="Ghi chú (địa điểm, tình trạng hàng...)" maxlength="500" />
+                            <button class="btn btn-primary w-100">Ghi nhận: @nextMilestone</button>
+                        </form>
+                    }
+                    if (Model.Status == OrderStatuses.InTransit)
+                    {
+                        <hr />
+                        <h6 class="fw-bold mb-2">Sự cố khi vận chuyển</h6>
+                        <div class="small text-muted mb-2">Người nhận từ chối, hàng hỏng, xe hỏng... không giao được. Đơn kết thúc ở "Hoàn hàng" (không phải hủy).</div>
+                        <form asp-action="ReturnOrder" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Ghi nhận hoàn hàng cho đơn này?');">
+                            <input name="detail" class="form-control mb-2" placeholder="Lý do hoàn hàng (bắt buộc)" maxlength="500" required />
+                            <button class="btn btn-outline-danger w-100">Hoàn hàng</button>
+                        </form>
+                    }
+                    
+                }
+            </div>
+
+            <div class="card border-0 shadow-sm p-4 mb-4">
+                <h6 class="fw-bold mb-3">Xe & tài xế</h6>
+                <p class="small mb-2">Xe: <strong>@(Model.Vehicle?.PlateNumber ?? "Chưa gán")</strong> · Tài xế: <strong>@(Model.Driver?.FullName ?? "Chưa gán")</strong></p>
+                @if (Model.Status == OrderStatuses.Confirmed && Model.VehicleId == null)
+                {
+                    <a asp-controller="Trip" asp-action="Create" class="btn btn-outline-primary w-100">Tạo chuyến để phân công</a>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="card border-0 shadow-sm p-4 mb-4">
+                <h6 class="fw-bold mb-2">Đơn đã kết thúc</h6>
+                <p class="mb-0 small text-muted">Xe: @(Model.Vehicle?.PlateNumber ?? "—") · Tài xế: @(Model.Driver?.FullName ?? "—")</p>
+            </div>
+        }
+
+        <div class="card border-0 shadow-sm p-4">
+            <h6 class="fw-bold mb-3">Thêm mốc hành trình</h6>
+            <form asp-action="AddNote" asp-route-id="@Model.Id" method="post">
+                <input name="title" class="form-control mb-2" placeholder="Ví dụ: Đã đến kho Bình Dương" maxlength="150" required />
+                <input name="detail" class="form-control mb-2" placeholder="Chi tiết (tuỳ chọn)" maxlength="500" />
+                <button class="btn btn-outline-secondary w-100">Thêm mốc</button>
+            </form>
+        </div>
+    </div>
+</div>

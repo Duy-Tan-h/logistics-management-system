@@ -1,0 +1,10 @@
+﻿@model StaticPage
+@{
+    ViewData["Title"] = Model.Title;
+}
+<partial name="_PageHero" model='new WebVanChuyenLogicstic.Models.PageHeroViewModel(Model.Title, Model.Subtitle ?? "", Model.Icon)' />
+<section class="section-space">
+    <div class="container narrow-content">
+        <article class="content-card policy-content">@Html.Raw(Model.Content)</article>
+    </div>
+</section>

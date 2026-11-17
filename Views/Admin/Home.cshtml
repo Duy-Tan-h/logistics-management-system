@@ -1,0 +1,141 @@
+﻿@model WebVanChuyenLogicstic.Models.DashboardViewModel
+@{
+    ViewData["Title"] = "Tổng quan";
+    string Active(string key) => Model.Range == key ? "active" : "";
+    var maxRev = Model.Months.Max(m => m.Revenue);
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div>
+        <h4 class="fw-bold mb-0">Tổng quan</h4>
+        <div class="small text-muted">Số liệu @Model.RangeLabel</div>
+    </div>
+    <div class="d-flex flex-wrap gap-2 align-items-center">
+        <ul class="nav nav-pills small">
+            <li class="nav-item"><a class="nav-link py-1 @Active("7d")" asp-action="Home" asp-route-range="7d">7 ngày</a></li>
+            <li class="nav-item"><a class="nav-link py-1 @Active("30d")" asp-action="Home" asp-route-range="30d">30 ngày</a></li>
+            <li class="nav-item"><a class="nav-link py-1 @Active("month")" asp-action="Home" asp-route-range="month">Tháng này</a></li>
+            <li class="nav-item"><a class="nav-link py-1 @Active("year")" asp-action="Home" asp-route-range="year">Năm nay</a></li>
+            <li class="nav-item"><a class="nav-link py-1 @Active("all")" asp-action="Home" asp-route-range="all">Tất cả</a></li>
+        </ul>
+        <a class="btn btn-sm btn-outline-success" asp-action="ExportOrders" asp-route-range="@Model.Range"><i class="bi bi-file-earmark-spreadsheet me-1"></i> Xuất báo cáo CSV</a>
+    </div>
+</div>
+
+@if (Model.PendingQuotes > 0 || Model.UnreadContacts > 0)
+{
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        @if (Model.PendingQuotes > 0)
+        {
+            <a class="alert alert-warning py-2 px-3 mb-0 text-decoration-none" asp-controller="Order" asp-action="Index" asp-route-status="@OrderStatuses.QuoteRequested">
+                <i class="bi bi-exclamation-circle me-1"></i> <b>@Model.PendingQuotes</b> yêu cầu đang chờ báo giá
+            </a>
+        }
+        @if (Model.UnreadContacts > 0)
+        {
+            <a class="alert alert-info py-2 px-3 mb-0 text-decoration-none" asp-controller="Contact" asp-action="Index">
+                <i class="bi bi-envelope me-1"></i> <b>@Model.UnreadContacts</b> tin nhắn liên hệ chưa phản hồi
+            </a>
+        }
+    </div>
+}
+<div class="row g-3 mb-3">
+    <div class="col-6 col-xl-3"><div class="card border-0 shadow-sm p-3 h-100"><div class="text-muted small">Chờ xử lý</div><div class="fs-2 fw-bold text-warning">@Model.PendingGroup</div><div class="small text-muted">Báo giá, chờ khách, đã xác nhận</div></div></div>
+    <div class="col-6 col-xl-3"><div class="card border-0 shadow-sm p-3 h-100"><div class="text-muted small">Đang vận chuyển</div><div class="fs-2 fw-bold text-primary">@Model.InTransitOrders</div></div></div>
+    <div class="col-6 col-xl-3"><div class="card border-0 shadow-sm p-3 h-100"><div class="text-muted small">Hoàn thành</div><div class="fs-2 fw-bold text-success">@Model.DeliveredOrders</div></div></div>
+    <div class="col-6 col-xl-3"><div class="card border-0 shadow-sm p-3 h-100"><div class="text-muted small">Đã hủy</div><div class="fs-2 fw-bold text-secondary">@Model.CancelledOrders</div></div></div>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="card border-0 shadow-sm p-3 h-100">
+            <div class="d-flex justify-content-between"><span class="text-muted small">Tổng số đơn</span><i class="bi bi-box-seam text-primary fs-4"></i></div>
+            <div class="fs-2 fw-bold">@Model.TotalOrders</div>
+            <div class="small text-muted">@Model.DeliveredOrders đã giao thành công</div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card border-0 shadow-sm p-3 h-100">
+            <div class="d-flex justify-content-between"><span class="text-muted small">Doanh thu</span><i class="bi bi-cash-coin text-success fs-4"></i></div>
+            <div class="fs-3 fw-bold">@OrderFormat.Money(Model.Revenue)</div>
+            <div class="small text-muted">Tính trên các đơn đã giao</div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card border-0 shadow-sm p-3 h-100">
+            <div class="d-flex justify-content-between"><span class="text-muted small">Khách hàng</span><i class="bi bi-people text-warning fs-4"></i></div>
+            <div class="fs-2 fw-bold">@Model.TotalCustomers</div>
+            <div class="small text-muted">Tài khoản khách hàng</div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card border-0 shadow-sm p-3 h-100">
+            <div class="d-flex justify-content-between"><span class="text-muted small">Chuyến vận chuyển</span><i class="bi bi-truck text-danger fs-4"></i></div>
+            <div class="fs-2 fw-bold">@Model.Trips</div>
+            <div class="small text-muted">@Model.TripsInProgress đang vận chuyển</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm p-4 h-100">
+            <h6 class="fw-bold mb-3">Đơn hàng theo trạng thái</h6>
+            @foreach (var s in Model.StatusStats)
+            {
+                var pct = Model.TotalOrders == 0 ? 0 : (int)Math.Round(100.0 * s.Count / Model.TotalOrders);
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span class="badge @OrderStatuses.Badge(s.Status)">@s.Status</span>
+                        <span class="fw-semibold">@s.Count (@pct%)</span>
+                    </div>
+                    <div class="progress" style="height:8px"><div class="progress-bar" style="width:@(pct)%"></div></div>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm p-4 h-100">
+            <h6 class="fw-bold mb-1">Doanh thu 6 tháng gần nhất</h6>
+            <div class="small text-muted mb-3">Đơn đã giao, tính theo tháng tạo đơn (triệu đồng)</div>
+            <div class="d-flex align-items-end gap-2" style="height:190px">
+                @foreach (var m in Model.Months)
+                {
+                    var px = maxRev == 0 ? 3 : Math.Max(3, (int)(120m * m.Revenue / maxRev));
+                    <div class="flex-fill text-center">
+                        <div class="small text-muted" style="font-size:.7rem;height:16px">@(m.Revenue == 0 ? "" : (m.Revenue / 1000000m).ToString("0.#"))</div>
+                        <div class="bg-primary rounded-top mx-auto" style="height:@(px)px;width:70%" title="@OrderFormat.Money(m.Revenue) · @m.Orders đơn"></div>
+                        <div class="small text-muted mt-1">@m.Label</div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="fw-bold mb-0">Đơn hàng mới nhất</h6>
+        <a asp-controller="Order" asp-action="Index" class="small">Xem tất cả</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light"><tr><th>Mã đơn</th><th>Khách hàng</th><th>Trạng thái</th><th>Giá báo</th><th>Ngày tạo</th></tr></thead>
+            <tbody>
+                @foreach (var o in Model.RecentOrders)
+                {
+                    <tr>
+                        <td><a asp-controller="Order" asp-action="Details" asp-route-id="@o.Id" class="fw-semibold">@o.OrderCode</a></td>
+                        <td>@o.CustomerName</td>
+                        <td><span class="badge @OrderStatuses.Badge(o.Status)">@o.Status</span></td>
+                        <td>@OrderFormat.Money(o.QuotedPrice)</td>
+                        <td class="small text-muted">@o.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                    </tr>
+                }
+                @if (!Model.RecentOrders.Any())
+                {
+                    <tr><td colspan="5" class="text-center text-muted py-4">Chưa có đơn hàng nào.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

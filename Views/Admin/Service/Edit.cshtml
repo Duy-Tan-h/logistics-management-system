@@ -1,0 +1,12 @@
+﻿@model WebVanChuyenLogicstic.Models.TransportService
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Sửa dịch vụ";
+}
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a asp-action="Index" class="btn btn-light border"><i class="bi bi-arrow-left"></i></a>
+    <h4 class="fw-bold mb-0">Sửa dịch vụ</h4>
+</div>
+
+<partial name="~/Views/Admin/Service/_Form.cshtml" model="Model" />

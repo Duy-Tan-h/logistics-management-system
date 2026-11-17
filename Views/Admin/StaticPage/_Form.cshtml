@@ -1,0 +1,63 @@
+﻿@model WebVanChuyenLogicstic.Models.StaticPage
+@{
+    var isNew = Model.Id == 0;
+}
+
+<form asp-action="@(isNew ? "Create" : "Edit")" asp-route-id="@Model.Id" method="post" class="card border-0 shadow-sm p-4" style="max-width:900px">
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-8">
+            <label asp-for="Title" class="form-label fw-semibold">Tiêu đề <span class="text-danger">*</span></label>
+            <input asp-for="Title" class="form-control" />
+            <span asp-validation-for="Title" class="text-danger small"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Icon" class="form-label fw-semibold">Biểu tượng</label>
+            <input asp-for="Icon" class="form-control" placeholder="bi-shield-check" />
+            <span asp-validation-for="Icon" class="text-danger small"></span>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Slug" class="form-label fw-semibold">Đường dẫn <span class="text-danger">*</span></label>
+        @if (Model.IsSystem)
+        {
+            <input asp-for="Slug" class="form-control" readonly />
+            <div class="form-text">Trang hệ thống gắn với menu/footer nên không đổi được đường dẫn.</div>
+        }
+        else
+        {
+            <div class="input-group">
+                <span class="input-group-text">/trang/</span>
+                <input asp-for="Slug" class="form-control" placeholder="quy-dinh-gui-hang" />
+            </div>
+            <div class="form-text">Chữ thường không dấu, số và dấu gạch ngang.</div>
+        }
+        <span asp-validation-for="Slug" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Subtitle" class="form-label fw-semibold">Mô tả ngắn (hiện dưới tiêu đề trang)</label>
+        <input asp-for="Subtitle" class="form-control" />
+        <span asp-validation-for="Subtitle" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Content" class="form-label fw-semibold">Nội dung <span class="text-danger">*</span></label>
+        <textarea asp-for="Content" rows="14" class="form-control font-monospace" style="font-size:.85rem"></textarea>
+        <div class="form-text">Nhập bằng HTML: tiêu đề mục <code>&lt;h2&gt;...&lt;/h2&gt;</code>, đoạn văn <code>&lt;p&gt;...&lt;/p&gt;</code>, danh sách <code>&lt;ul&gt;&lt;li&gt;...&lt;/li&gt;&lt;/ul&gt;</code>. Chỉ admin mới sửa được trường này.</div>
+        <span asp-validation-for="Content" class="text-danger small"></span>
+    </div>
+
+    <div class="form-check form-switch mb-4">
+        <input asp-for="IsPublished" class="form-check-input" />
+        <label asp-for="IsPublished" class="form-check-label fw-semibold">Hiển thị trên website</label>
+    </div>
+
+    <div class="text-end">
+        <a asp-action="Index" class="btn btn-light border me-2">Hủy</a>
+        <button class="btn btn-primary px-4">@(isNew ? "Thêm trang" : "Lưu thay đổi")</button>
+    </div>
+</form>

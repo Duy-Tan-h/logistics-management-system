@@ -1,0 +1,43 @@
+﻿@model HomeSectionContext
+@{
+    var s = Model.Section;
+    var (titleStart, titleEnd) = s.Title.SplitLastWords(4);
+}
+<section class="section-space section-mesh-dark">
+    <div class="container position-relative">
+        <div class="section-heading text-center mx-auto">
+            @if (!string.IsNullOrEmpty(s.Kicker))
+            {
+                <span class="section-kicker"><i class="bi bi-patch-check"></i> @s.Kicker</span>
+            }
+            <h2>@titleStart <span class="accent-text">@titleEnd</span></h2>
+            @if (!string.IsNullOrEmpty(s.Subtitle))
+            {
+                <p>@s.Subtitle</p>
+            }
+        </div>
+
+        <div class="why-tile-grid mt-3">
+            @foreach (var item in s.Items)
+            {
+                var isStat = !string.IsNullOrEmpty(item.Value);
+                <div class="why-tile">
+                    @if (!string.IsNullOrEmpty(item.Icon))
+                    {
+                        <div class="why-tile-icon"><i class="bi @item.Icon"></i></div>
+                    }
+                    @if (isStat)
+                    {
+                        <strong class="why-tile-value">@item.Value</strong>
+                        <span class="why-tile-label">@item.Title</span>
+                    }
+                    else
+                    {
+                        <h3>@item.Title</h3>
+                        <p>@item.Description</p>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</section>

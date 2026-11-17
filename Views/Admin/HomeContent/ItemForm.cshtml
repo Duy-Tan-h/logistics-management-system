@@ -1,0 +1,225 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@using WebVanChuyenLogicstic.Models
+@model WebVanChuyenLogicstic.Models.Admin.HomeSectionItemEditViewModel
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    var isNew = Model.Id == 0;
+    ViewData["Title"] = (isNew ? "Thêm mục: " : "Sửa mục: ") + Model.SectionLabel;
+
+    var t = Model.SectionType;
+    bool isHero = t == HomeSectionTypes.Hero;
+    bool showValue = t is HomeSectionTypes.Hero or HomeSectionTypes.WhyChooseUs;
+    bool showIcon = t is HomeSectionTypes.WhyChooseUs or HomeSectionTypes.Projects or HomeSectionTypes.Contact;
+    bool showDesc = showIcon;
+    bool showProject = t == HomeSectionTypes.Projects;
+}
+
+<style>
+    .admin-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.04);
+        border: 1px solid #f3f4f6;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #374151;
+        font-size: .9rem;
+    }
+
+    .icon-picker {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        gap: .5rem;
+    }
+
+    .icon-picker-btn {
+        border: 1px solid #e5e7eb;
+        background: #fff;
+        border-radius: 8px;
+        padding: .5rem;
+        font-size: 1.1rem;
+        color: #4b5563;
+        cursor: pointer;
+        transition: all .15s;
+    }
+
+        .icon-picker-btn:hover {
+            border-color: #93c5fd;
+            color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .icon-picker-btn.active {
+            border-color: #2563eb;
+            background: #2563eb;
+            color: #fff;
+        }
+    @@media (max-width: 575px) {
+        .icon-picker
+
+    {
+        grid-template-columns: repeat(6, 1fr);
+    }
+
+    }
+</style>
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a asp-action="EditSection" asp-route-id="@Model.SectionId" class="btn btn-light border text-muted px-3"><i class="bi bi-arrow-left"></i> Quay lại</a>
+    <div>
+        <h4 class="fw-bold mb-0">@(isNew ? "Thêm mục mới" : "Sửa mục")</h4>
+        <small class="text-muted">@Model.SectionLabel</small>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-7">
+        <form asp-action="SaveItem" method="post" class="admin-card p-4">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="SectionId" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            @if (showValue)
+            {
+                <div class="mb-3">
+                    <label asp-for="Value" class="form-label">Con số (để trống nếu đây là 1 lý do)</label>
+                    <input asp-for="Value" class="form-control" placeholder="98%" />
+                    <span asp-validation-for="Value" class="text-danger small"></span>
+                    @if (t == HomeSectionTypes.WhyChooseUs)
+                    {
+                        <div class="form-text">Điền số: mục này hiện dạng số liệu thống kê (bỏ qua Icon/Mô tả). Để trống: mục này hiện dạng lý do (icon + mô tả) như bình thường.</div>
+                    }
+                </div>
+            }
+            else
+            {
+
+                <input type="hidden" asp-for="Value" />
+            }
+
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label">@(isHero ? "Nhãn dưới con số" : "Tiêu đề") <span class="text-danger">*</span></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger small"></span>
+            </div>
+
+            @if (showIcon)
+            {
+                <div class="mb-3">
+                    <label asp-for="Icon" class="form-label">Icon (Bootstrap Icons)</label>
+                    <div class="icon-picker mb-2" id="iconPicker">
+                        @foreach (var icon in new[]
+                                            {
+                                        "bi-truck","bi-truck-front","bi-box-seam","bi-boxes",
+                                        "bi-geo-alt","bi-map","bi-globe2","bi-building",
+                                        "bi-shield-check","bi-patch-check","bi-clock-history","bi-speedometer2",
+                                        "bi-headset","bi-people","bi-person-check","bi-cash-coin",
+                                        "bi-credit-card","bi-graph-up-arrow","bi-award","bi-star",
+                                        "bi-lightning-charge","bi-calendar-check","bi-check2-circle","bi-recycle"
+                                        })
+                        {
+                            <button type="button" class="icon-picker-btn" data-icon="@icon" title="@icon">
+                                <i class="bi @icon"></i>
+                            </button>
+                        }
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text"><i id="iconPreview" class="bi @Model.Icon"></i></span>
+                        <input asp-for="Icon" class="form-control" placeholder="bi-truck" />
+                    </div>
+                    <div class="form-text">Tên icon lấy tại icons.getbootstrap.com, ví dụ <code>bi-truck</code>, <code>bi-headset</code>.</div>
+                    <span asp-validation-for="Icon" class="text-danger small"></span>
+                </div>
+            }
+            else
+            {
+
+                <input type="hidden" asp-for="Icon" />
+            }
+
+            @if (showDesc)
+            {
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Mô tả</label>
+                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Description" class="text-danger small"></span>
+                </div>
+            }
+            else
+            {
+
+                <input type="hidden" asp-for="Description" />
+            }
+
+            @if (showProject)
+            {
+                <div class="mb-3">
+                    <label asp-for="ImageUrl" class="form-label">Đường dẫn ảnh (không bắt buộc)</label>
+                    <input asp-for="ImageUrl" class="form-control" placeholder="/images/du-an-1.jpg" />
+                    <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="LinkUrl" class="form-label">Link "Xem chi tiết" (không bắt buộc)</label>
+                    <input asp-for="LinkUrl" class="form-control" placeholder="/News/Details/1" />
+                    <span asp-validation-for="LinkUrl" class="text-danger small"></span>
+                </div>
+            }
+            else
+            {
+
+                <input type="hidden" asp-for="ImageUrl" />
+                <input type="hidden" asp-for="LinkUrl" />
+ }
+
+            <div class="form-check form-switch mb-4">
+                <input asp-for="IsVisible" class="form-check-input" />
+                <label asp-for="IsVisible" class="form-check-label">Hiển thị trên trang chủ</label>
+            </div>
+
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-lg me-1"></i> @(isNew ? "Thêm mục" : "Lưu thay đổi")</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+                (function () {
+            var input = document.querySelector('input[name="Icon"]:not([type=hidden])');
+            var preview = document.getElementById('iconPreview');
+            var picker = document.getElementById('iconPicker');
+            if (!input || !preview) return;
+
+            function highlight(name) {
+                if (!picker) return;
+                picker.querySelectorAll('.icon-picker-btn').forEach(function (btn) {
+                    btn.classList.toggle('active', btn.dataset.icon === name);
+                });
+            }
+
+            input.addEventListener('input', function () {
+                preview.className = 'bi ' + input.value.replace(/[^a-z0-9-]/gi, '');
+                highlight(input.value.trim());
+            });
+
+            if (picker) {
+                picker.querySelectorAll('.icon-picker-btn').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        input.value = btn.dataset.icon;
+                        preview.className = 'bi ' + btn.dataset.icon;
+                        highlight(btn.dataset.icon);
+                    });
+                });
+                highlight(input.value); // mở trang Sửa: tô sáng icon đang dùng
+            }
+        })();
+    </script>
+}

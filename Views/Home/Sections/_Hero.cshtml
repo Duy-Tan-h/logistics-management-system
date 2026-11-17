@@ -1,0 +1,53 @@
+﻿@model HomeSectionContext
+@{
+    var s = Model.Section;
+    // Tách tiêu đề tại dấu phẩy đầu tiên để phần sau được tô màu (như giao diện cũ)
+    var comma = s.Title.IndexOf(", ");
+    var titleStart = comma > 0 ? s.Title[..(comma + 1)] : s.Title;
+    var titleEnd = comma > 0 ? s.Title[(comma + 2)..] : "";
+}
+<section class="hero-section">
+    <div class="hero-orb hero-orb-one"></div>
+    <div class="hero-orb hero-orb-two"></div>
+    <div class="container position-relative">
+        <div class="row align-items-center min-vh-hero">
+            <div class="col-lg-6 py-5">
+                <span class="eyebrow"><i class="bi bi-shield-check"></i> @s.Kicker</span>
+                <h1 class="hero-title mt-3">@titleStart <span>@titleEnd</span></h1>
+                <p class="hero-lead">@s.Subtitle</p>
+                <div class="d-flex flex-wrap gap-3 mt-4">
+                    @if (!string.IsNullOrEmpty(s.ButtonText))
+                    {
+                        <a href="@s.ButtonUrl" class="btn btn-accent btn-lg">@s.ButtonText <i class="bi bi-arrow-right ms-1"></i></a>
+                    }
+                    @if (!string.IsNullOrEmpty(s.SecondaryButtonText))
+                    {
+                        <a href="@s.SecondaryButtonUrl" class="btn btn-ghost-light btn-lg">@s.SecondaryButtonText</a>
+                    }
+                </div>
+                <div class="hero-stats mt-5">
+                    @foreach (var stat in s.Items)
+                    {
+                        <div><strong>@stat.Value</strong><span>@stat.Title</span></div>
+                    }
+                </div>
+            </div>
+            <div class="col-lg-6 py-5 d-none d-lg-block">
+                <div class="logistics-visual">
+                    <div class="route-line">
+                        <div class="route-orbit">
+                            <span class="route-dot"></span>
+                        </div>
+                    </div>
+                    <div class="visual-card main-card">
+                        <div class="truck-badge"><i class="bi bi-truck"></i></div>
+                        <div><small><span class="live-dot"></span>Đơn hàng đang vận chuyển</small><h4>TP.HCM → Hà Nội</h4><div class="progress"><div class="progress-bar"></div></div><span>Đã hoàn thành 72%</span></div>
+                    </div>
+                    <div class="visual-card mini-card card-a"><i class="bi bi-geo-alt-fill"></i><span>Giao hàng toàn quốc</span></div>
+                    <div class="visual-card mini-card card-b"><i class="bi bi-box-seam-fill"></i><span>12.480+ đơn/tháng</span></div>
+                    <div class="visual-icon"><i class="bi bi-globe-asia-australia"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

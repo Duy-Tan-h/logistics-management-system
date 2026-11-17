@@ -1,0 +1,89 @@
+﻿@model WebVanChuyenLogicstic.Models.AboutItem
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    var isNew = Model.Id == 0;
+    var kind = Model.Kind;
+    ViewData["Title"] = (isNew ? "Thêm " : "Sửa ") + AboutKinds.Label(kind);
+
+    var showIcon = kind == AboutKinds.Vision || kind == AboutKinds.Mission || kind == AboutKinds.CoreValue;
+    var showContent = kind != AboutKinds.Stat;
+    var showValue = kind == AboutKinds.Intro || kind == AboutKinds.Stat || kind == AboutKinds.Milestone;
+    var valueLabel = kind switch
+    {
+        AboutKinds.Intro => "Dòng nhãn nhỏ phía trên tiêu đề",
+        AboutKinds.Stat => "Con số (ví dụ 8+, 1M+)",
+        AboutKinds.Milestone => "Năm / mốc thời gian",
+        _ => ""
+    };
+    var titleLabel = kind switch
+    {
+        AboutKinds.Stat => "Mô tả con số (ví dụ Năm kinh nghiệm)",
+        AboutKinds.Milestone => "Tiêu đề cột mốc",
+        AboutKinds.Intro => "Tiêu đề lớn",
+        _ => "Tiêu đề"
+    };
+}
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a asp-action="Index" class="btn btn-light border"><i class="bi bi-arrow-left"></i></a>
+    <h4 class="fw-bold mb-0">@ViewData["Title"]</h4>
+</div>
+
+<form asp-action="@(isNew ? "Create" : "Edit")" asp-route-id="@Model.Id" method="post" class="card border-0 shadow-sm p-4" style="max-width:720px">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="Kind" />
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    @if (showValue)
+    {
+        <div class="mb-3">
+            <label asp-for="Value" class="form-label fw-semibold">@valueLabel</label>
+            <input asp-for="Value" class="form-control" />
+            <span asp-validation-for="Value" class="text-danger small"></span>
+        </div>
+    }
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label fw-semibold">@titleLabel <span class="text-danger">*</span></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger small"></span>
+    </div>
+    @if (showIcon)
+    {
+        <div class="mb-3">
+            <label asp-for="Icon" class="form-label fw-semibold">Biểu tượng (Bootstrap Icons)</label>
+            <input asp-for="Icon" class="form-control" placeholder="bi-heart" />
+            <span asp-validation-for="Icon" class="text-danger small"></span>
+        </div>
+    }
+    @if (showContent)
+    {
+        <div class="mb-3">
+            <label asp-for="Content" class="form-label fw-semibold">Nội dung <span class="text-danger">*</span></label>
+            <textarea asp-for="Content" rows="@(kind == AboutKinds.Intro ? 8 : 4)" class="form-control"></textarea>
+            @if (kind == AboutKinds.Intro)
+            {
+                <div class="form-text">Cách đoạn bằng một dòng trống.</div>
+            }
+            <span asp-validation-for="Content" class="text-danger small"></span>
+        </div>
+    }
+
+    <div class="row g-3 mb-4 align-items-end">
+        <div class="col-md-4">
+            <label asp-for="DisplayOrder" class="form-label fw-semibold">Thứ tự</label>
+            <input asp-for="DisplayOrder" type="number" min="0" max="999" class="form-control" />
+            <span asp-validation-for="DisplayOrder" class="text-danger small"></span>
+        </div>
+        <div class="col-md-8">
+            <div class="form-check form-switch">
+                <input asp-for="IsVisible" class="form-check-input" />
+                <label asp-for="IsVisible" class="form-check-label fw-semibold">Hiển thị trên website</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-end">
+        <a asp-action="Index" class="btn btn-light border me-2">Hủy</a>
+        <button class="btn btn-primary px-4">@(isNew ? "Thêm" : "Lưu thay đổi")</button>
+    </div>
+</form>

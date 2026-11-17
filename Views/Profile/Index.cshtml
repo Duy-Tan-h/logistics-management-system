@@ -1,0 +1,100 @@
+﻿@model ProfileViewModel
+@{
+    ViewData["Title"] = "Hồ sơ của tôi";
+}
+
+<partial name="_PageHero" model='new WebVanChuyenLogicstic.Models.PageHeroViewModel("Hồ sơ của tôi", "Cập nhật thông tin cá nhân và quản lý danh bạ địa chỉ.", "bi-person-circle")' />
+
+<section class="section-space">
+    <div class="container narrow-content">
+        @if (TempData["Msg"] is string ok)
+        {
+            <div class="alert alert-success">@ok</div>
+        }
+        @if (TempData["Err"] is string err)
+        {
+            <div class="alert alert-danger">@err</div>
+        }
+
+        <div class="content-card mb-4">
+            <h4 class="mb-3">Thông tin cá nhân</h4>
+            <form asp-action="Update" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input class="form-control" value="@Model.Email" disabled />
+                    <div class="form-text">Email dùng để đăng nhập nên không đổi được.</div>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="FullName" class="form-label">Họ và tên</label>
+                    <input asp-for="FullName" class="form-control" />
+                    <span asp-validation-for="FullName" class="text-danger small"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Phone" class="form-label">Số điện thoại</label>
+                    <input asp-for="Phone" type="tel" class="form-control" />
+                    <span asp-validation-for="Phone" class="text-danger small"></span>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn btn-accent">Lưu thay đổi</button>
+                    <a class="btn btn-outline-secondary" asp-controller="Account" asp-action="ChangePassword">Đổi mật khẩu</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="content-card">
+            <h4 class="mb-1">Danh bạ địa chỉ</h4>
+            <p class="text-muted small">Lưu địa chỉ lấy/giao hàng thường dùng (tối đa 10), chọn nhanh khi gửi yêu cầu báo giá.</p>
+
+            @if (!Model.Addresses.Any())
+            {
+                <p class="text-muted">Chưa có địa chỉ nào.</p>
+            }
+            @foreach (var a in Model.Addresses)
+            {
+                <div class="border-bottom py-2">
+                    <div class="d-flex justify-content-between align-items-start gap-3">
+                        <div>
+                            <strong>@a.Label</strong>
+                            <div class="small text-muted">@a.Address</div>
+                            @if (!string.IsNullOrEmpty(a.ContactName) || !string.IsNullOrEmpty(a.Phone))
+                            {
+                                <div class="small text-muted"><i class="bi bi-person"></i> @a.ContactName @(string.IsNullOrEmpty(a.Phone) ? "" : "· " + a.Phone)</div>
+                            }
+                        </div>
+                        <div class="d-flex gap-1">
+                            <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#edit-@a.Id">Sửa</button>
+                            <form asp-action="DeleteAddress" asp-route-id="@a.Id" method="post" onsubmit="return confirm('Xóa địa chỉ này?');">
+                                <button class="btn btn-sm btn-outline-danger">Xóa</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="collapse mt-2" id="edit-@a.Id">
+                        <form asp-action="EditAddress" asp-route-id="@a.Id" method="post">
+                            <div class="row g-2">
+                                <div class="col-md-4"><input name="label" class="form-control" value="@a.Label" maxlength="60" required placeholder="Tên gợi nhớ" /></div>
+                                <div class="col-md-8"><input name="address" class="form-control" value="@a.Address" maxlength="300" required placeholder="Địa chỉ đầy đủ" /></div>
+                                <div class="col-md-5"><input name="contactName" class="form-control" value="@a.ContactName" maxlength="100" placeholder="Tên người liên hệ" /></div>
+                                <div class="col-md-4"><input name="phone" type="tel" class="form-control" value="@a.Phone" maxlength="30" placeholder="Số điện thoại" /></div>
+                                <div class="col-md-3"><button class="btn btn-primary w-100">Lưu</button></div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+
+            <form asp-action="AddAddress" method="post" class="mt-3">
+                <div class="row g-2">
+                    <div class="col-md-4"><input name="label" class="form-control" placeholder="Tên gợi nhớ (Nhà, Kho...)" maxlength="60" required /></div>
+                    <div class="col-md-8"><input name="address" class="form-control" placeholder="Địa chỉ đầy đủ" maxlength="300" required /></div>
+                    <div class="col-md-5"><input name="contactName" class="form-control" placeholder="Tên người liên hệ" maxlength="100" /></div>
+                    <div class="col-md-4"><input name="phone" type="tel" class="form-control" placeholder="Số điện thoại" maxlength="30" /></div>
+                    <div class="col-md-3"><button class="btn btn-primary w-100">Thêm</button></div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

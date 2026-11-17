@@ -1,0 +1,72 @@
+﻿@model HomeSectionContext
+@{
+    var s = Model.Section;
+    var covers = new[] { "news-cover-a", "news-cover-b", "news-cover-c" };
+    var (titleStart, titleEnd) = s.Title.SplitLastWords(3);
+}
+<section class="section-space">
+    <div class="container">
+        <div class="section-heading text-center mx-auto">
+            @if (!string.IsNullOrEmpty(s.Kicker))
+            {
+                <span class="section-kicker"><i class="bi bi-newspaper"></i> @s.Kicker</span>
+            }
+            <h2>@titleStart <span class="accent-text">@titleEnd</span></h2>
+            @if (!string.IsNullOrEmpty(s.Subtitle))
+            {
+                <p>@s.Subtitle</p>
+            }
+        </div>
+
+        @if (Model.Page.FeaturedArticles.Any())
+        {
+            <div class="news-grid mt-3">
+                @for (var i = 0; i < Model.Page.FeaturedArticles.Count; i++)
+                {
+                    var article = Model.Page.FeaturedArticles[i];
+                    var isFeatured = i == 0;
+                    var cover = covers[i % covers.Length];
+                    var hasImage = !string.IsNullOrEmpty(article.ImageUrl);
+
+                    <a asp-controller="News" asp-action="Details" asp-route-id="@article.Id"
+                       class="news-card @(hasImage ? "" : cover) text-decoration-none @(isFeatured ? "news-card-featured" : "")">
+                        @if (hasImage)
+                        {
+                            <img src="@article.ImageUrl" alt="@article.Title" class="news-card-img" />
+                        }
+                        else
+                        {
+                            <i class="bi @article.Icon news-decor-icon"></i>
+                        }
+                        @if (isFeatured)
+                        {
+                            <span class="news-tag-featured"><i class="bi bi-fire"></i> Nổi bật</span>
+                        }
+                        <div class="news-overlay">
+                            <span class="news-badge">@article.Category</span>
+                            <h3>@article.Title</h3>
+                            @if (isFeatured)
+                            {
+                                <p>@article.Summary</p>
+                            }
+                            <div class="news-meta">
+                                <span><i class="bi bi-calendar3 me-1"></i> @article.PublishedAt.ToString("dd/MM/yyyy")</span>
+                                @if (isFeatured)
+                                {
+                                    <span class="read-more">Đọc tiếp <i class="bi bi-arrow-right"></i></span>
+                                }
+                            </div>
+                        </div>
+                    </a>
+                }
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(s.ButtonText))
+        {
+            <div class="text-center mt-5">
+                <a href="@s.ButtonUrl" class="btn btn-outline-brand">@s.ButtonText <i class="bi bi-arrow-right ms-1"></i></a>
+            </div>
+        }
+    </div>
+</section>

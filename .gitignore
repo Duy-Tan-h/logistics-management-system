@@ -1,0 +1,11 @@
+.vs/
+**/bin/
+**/obj/
+packages/
+*.user
+*.suo
+*.mdf
+*.ldf
+*.bak
+appsettings.Local.json
+.env

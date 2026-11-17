@@ -1,0 +1,58 @@
+﻿@model WebVanChuyenLogicstic.Models.Admin.HomeSectionCreateViewModel
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Thêm section mới";
+    var types = (Dictionary<string, string>)ViewBag.Types;
+}
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a asp-action="Index" class="btn btn-light border">← Quay lại</a>
+    <h4 class="fw-bold mb-0">Thêm section mới</h4>
+</div>
+
+<form asp-action="CreateSection" method="post" class="card border-0 shadow-sm p-4" style="max-width:700px">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label class="form-label fw-semibold">Chọn khuôn giao diện <span class="text-danger">*</span></label>
+        <select asp-for="SectionType" class="form-select">
+            <option value="">-- Chọn --</option>
+            @foreach (var t in types)
+            {
+                <option value="@t.Key">@t.Value</option>
+            }
+        </select>
+        <span asp-validation-for="SectionType" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label fw-semibold">Tiêu đề <span class="text-danger">*</span></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Subtitle" class="form-label fw-semibold">Mô tả ngắn</label>
+        <textarea asp-for="Subtitle" class="form-control" rows="3"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Body" class="form-label fw-semibold">Nội dung thêm (nếu có)</label>
+        <textarea asp-for="Body" class="form-control" rows="3"></textarea>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-5">
+            <label asp-for="ButtonText" class="form-label fw-semibold">Chữ trên nút</label>
+            <input asp-for="ButtonText" class="form-control" />
+        </div>
+        <div class="col-md-7">
+            <label asp-for="ButtonUrl" class="form-label fw-semibold">Link nút</label>
+            <input asp-for="ButtonUrl" class="form-control" placeholder="/Service" />
+        </div>
+    </div>
+
+    <div class="text-end">
+        <button type="submit" class="btn btn-primary px-4">Tạo section</button>
+    </div>
+</form>

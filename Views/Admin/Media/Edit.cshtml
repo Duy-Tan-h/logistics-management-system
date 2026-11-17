@@ -1,0 +1,14 @@
+﻿@model WebVanChuyenLogicstic.Models.MediaItem
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    var isBanner = Model.Type == MediaTypes.Banner;
+    var noun = isBanner ? "banner" : "đối tác";
+    ViewData["Title"] = "Sửa " + noun;
+}
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a asp-action="Index" asp-route-type="@Model.Type" class="btn btn-light border"><i class="bi bi-arrow-left"></i></a>
+    <h4 class="fw-bold mb-0">Sửa @noun</h4>
+</div>
+
+<partial name="~/Views/Admin/Media/_Form.cshtml" model="Model" />

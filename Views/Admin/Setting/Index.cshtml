@@ -1,0 +1,119 @@
+﻿@model WebVanChuyenLogicstic.Models.SiteSetting
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Cấu hình website";
+}
+
+<h4 class="fw-bold mb-4">Cấu hình website</h4>
+
+@if (TempData["SuccessMessage"] is string ok)
+{
+    <div class="alert alert-success">@ok</div>
+}
+
+<form asp-action="Index" method="post" enctype="multipart/form-data" style="max-width:820px">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="card border-0 shadow-sm p-4 mb-4">
+        <h6 class="fw-bold mb-3">Nhận diện thương hiệu</h6>
+        <div class="mb-3">
+            <label asp-for="SiteName" class="form-label fw-semibold">Tên website <span class="text-danger">*</span></label>
+            <input asp-for="SiteName" class="form-control" />
+            <span asp-validation-for="SiteName" class="text-danger small"></span>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Logo</label>
+                @if (!string.IsNullOrEmpty(Model.LogoUrl))
+                {
+                    <div class="mb-2"><img src="@Model.LogoUrl" alt="Logo" style="height:48px;max-width:100%;object-fit:contain" /></div>
+                    <div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="removeLogo" value="true" id="rmLogo" /><label class="form-check-label" for="rmLogo">Xóa logo (dùng chữ mặc định)</label></div>
+                }
+                <input type="file" name="logo" class="form-control" accept=".jpg,.jpeg,.png,.webp,.gif" />
+                <div class="form-text">Ảnh tối đa 3 MB. Chọn file mới sẽ thay logo cũ.</div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Favicon (biểu tượng tab trình duyệt)</label>
+                @if (!string.IsNullOrEmpty(Model.FaviconUrl))
+                {
+                    <div class="mb-2"><img src="@Model.FaviconUrl" alt="Favicon" style="height:32px;width:32px;object-fit:contain" /></div>
+                    <div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="removeFavicon" value="true" id="rmFav" /><label class="form-check-label" for="rmFav">Xóa favicon (dùng mặc định)</label></div>
+                }
+                <input type="file" name="favicon" class="form-control" accept=".ico,.png,.jpg,.jpeg,.webp,.gif" />
+                <div class="form-text">Nên dùng ảnh vuông .png hoặc .ico.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm p-4 mb-4">
+        <h6 class="fw-bold mb-3">Thông tin liên hệ (thanh trên cùng và footer)</h6>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="Hotline" class="form-label fw-semibold">Hotline <span class="text-danger">*</span></label>
+                <input asp-for="Hotline" class="form-control" />
+                <span asp-validation-for="Hotline" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Email" class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+            <div class="col-12">
+                <label asp-for="Address" class="form-label fw-semibold">Địa chỉ <span class="text-danger">*</span></label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger small"></span>
+            </div>
+            <div class="col-12">
+                <label asp-for="WorkingHours" class="form-label fw-semibold">Giờ làm việc</label>
+                <input asp-for="WorkingHours" class="form-control" placeholder="T2 - T7: 7:30 - 18:00" />
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm p-4 mb-4">
+        <h6 class="fw-bold mb-3">Footer</h6>
+        <div class="mb-3">
+            <label asp-for="FooterIntro" class="form-label fw-semibold">Giới thiệu ngắn</label>
+            <textarea asp-for="FooterIntro" rows="2" class="form-control"></textarea>
+            <span asp-validation-for="FooterIntro" class="text-danger small"></span>
+        </div>
+        <div>
+            <label asp-for="Copyright" class="form-label fw-semibold">Dòng bản quyền</label>
+            <input asp-for="Copyright" class="form-control" />
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm p-4 mb-4">
+        <h6 class="fw-bold mb-1">Mạng xã hội</h6>
+        <p class="text-muted small">Để trống mạng nào thì biểu tượng đó không hiện ở footer.</p>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="FacebookUrl" class="form-label fw-semibold">Facebook</label>
+                <input asp-for="FacebookUrl" class="form-control" placeholder="https://facebook.com/..." />
+                <span asp-validation-for="FacebookUrl" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="YoutubeUrl" class="form-label fw-semibold">YouTube</label>
+                <input asp-for="YoutubeUrl" class="form-control" placeholder="https://youtube.com/..." />
+                <span asp-validation-for="YoutubeUrl" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="LinkedInUrl" class="form-label fw-semibold">LinkedIn</label>
+                <input asp-for="LinkedInUrl" class="form-control" placeholder="https://linkedin.com/..." />
+                <span asp-validation-for="LinkedInUrl" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="TikTokUrl" class="form-label fw-semibold">TikTok</label>
+                <input asp-for="TikTokUrl" class="form-control" placeholder="https://tiktok.com/..." />
+                <span asp-validation-for="TikTokUrl" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="ZaloUrl" class="form-label fw-semibold">Zalo</label>
+                <input asp-for="ZaloUrl" class="form-control" placeholder="https://zalo.me/..." />
+                <span asp-validation-for="ZaloUrl" class="text-danger small"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-end"><button class="btn btn-primary px-4">Lưu cấu hình</button></div>
+</form>

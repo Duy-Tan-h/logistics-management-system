@@ -1,0 +1,68 @@
+﻿@model List<string>
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Thư viện ảnh";
+}
+
+<h4 class="fw-bold mb-2">Thư viện ảnh</h4>
+<p class="text-muted small mb-3"><i class="bi bi-info-circle me-1"></i>Kho ảnh chung của website. Upload một lần, bấm <b>Sao chép</b> rồi dán vào ô "Đường dẫn ảnh" ở Dịch vụ, Tin tức hoặc Quản lý trang chủ.</p>
+
+@if (TempData["SuccessMessage"] is string ok)
+{
+    <div class="alert alert-success">@ok</div>
+}
+@if (TempData["ErrorMessage"] is string err)
+{
+    <div class="alert alert-danger">@err</div>
+}
+
+<form asp-action="Library" method="post" enctype="multipart/form-data" class="card border-0 shadow-sm p-3 mb-4">
+    <div class="row g-2 align-items-center">
+        <div class="col-md-8"><input type="file" name="images" class="form-control" accept=".jpg,.jpeg,.png,.webp,.gif" multiple required /></div>
+        <div class="col-md-4"><button class="btn btn-primary w-100"><i class="bi bi-upload me-1"></i> Tải lên (tối đa 3 MB/ảnh)</button></div>
+    </div>
+</form>
+
+<input id="libSearch" class="form-control mb-3" placeholder="Tìm theo tên hoặc thư mục (ví dụ: News, dich-vu)..." />
+<div class="small text-muted mb-2">@(Model is IPagedList lp ? lp.TotalCount : Model.Count) ảnh</div>
+
+<div class="row g-3" id="libGrid">
+    @foreach (var f in Model)
+    {
+        <div class="col-6 col-md-4 col-lg-3 lib-item" data-path="@f.ToLowerInvariant()">
+            <div class="card border-0 shadow-sm h-100">
+                <img src="@f" alt="" style="height:130px;object-fit:cover;border-radius:.5rem .5rem 0 0" loading="lazy" />
+                <div class="p-2">
+                    <input class="form-control form-control-sm mb-2" value="@f" readonly />
+                    <div class="d-flex gap-1">
+                        <button type="button" class="btn btn-sm btn-outline-primary flex-fill" data-copy="@f">Sao chép</button>
+                        @if (f.StartsWith("/uploads/library/"))
+                        {
+                            <form asp-action="DeleteFile" method="post" onsubmit="return confirm('Xóa ảnh này? Nơi nào đang dùng ảnh sẽ mất hình.');">
+                                <input type="hidden" name="path" value="@f" />
+                                <button class="btn btn-sm btn-outline-danger">Xóa</button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    document.querySelectorAll('[data-copy]').forEach(function (b) {
+        b.addEventListener('click', function () {
+            navigator.clipboard.writeText(b.getAttribute('data-copy')).then(function () {
+                var t = b.textContent; b.textContent = 'Đã chép'; setTimeout(function () { b.textContent = t; }, 1200);
+            });
+        });
+    });
+    document.getElementById('libSearch').addEventListener('input', function (e) {
+        var q = e.target.value.trim().toLowerCase();
+        document.querySelectorAll('.lib-item').forEach(function (el) {
+            el.style.display = el.getAttribute('data-path').indexOf(q) >= 0 ? '' : 'none';
+        });
+    });
+</script>
+<partial name="_Pager" model="Model" />

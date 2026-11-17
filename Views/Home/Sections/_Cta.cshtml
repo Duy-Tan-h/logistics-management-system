@@ -1,0 +1,54 @@
+﻿@model HomeSectionContext
+@{
+    var s = Model.Section;
+}
+<section class="cta-section">
+    <div class="cta-decor cta-decor-1"></div>
+    <div class="cta-decor cta-decor-2"></div>
+    <i class="bi bi-truck cta-decor-icon"></i>
+
+    <div class="container">
+        <div class="cta-grid">
+            <div class="cta-text">
+                @if (!string.IsNullOrEmpty(s.Kicker))
+                {
+                    <span class="cta-eyebrow"><i class="bi bi-lightning-charge-fill"></i> @s.Kicker</span>
+                }
+                <h2>@s.Title</h2>
+                @if (!string.IsNullOrEmpty(s.Subtitle))
+                {
+                    <p>@s.Subtitle</p>
+                }
+                <div class="cta-actions">
+                    @if (!string.IsNullOrEmpty(s.ButtonText))
+                    {
+                        <a href="@s.ButtonUrl" class="cta-btn-primary">@s.ButtonText <i class="bi bi-arrow-right ms-2"></i></a>
+                    }
+                    @if (!string.IsNullOrEmpty(s.SecondaryButtonText))
+                    {
+                        <a href="@s.SecondaryButtonUrl" class="cta-btn-secondary"><i class="bi bi-telephone-fill me-2"></i>@s.SecondaryButtonText</a>
+                    }
+                </div>
+            </div>
+
+            <div class="cta-stats">
+                <div class="cta-stat-chip">
+                    <strong>500+</strong>
+                    <span>Doanh nghiệp tin dùng</span>
+                </div>
+                <div class="cta-stat-chip">
+                    <strong>63</strong>
+                    <span>Tỉnh thành phủ sóng</span>
+                </div>
+                <div class="cta-stat-chip">
+                    <strong>24/7</strong>
+                    <span>Hỗ trợ &amp; điều phối</span>
+                </div>
+                <div class="cta-stat-chip">
+                    <strong>98%</strong>
+                    <span>Đơn giao đúng hẹn</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

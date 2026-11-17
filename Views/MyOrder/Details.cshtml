@@ -1,0 +1,102 @@
+﻿@model WebVanChuyenLogicstic.Models.Order
+@{
+    ViewData["Title"] = "Đơn " + Model.OrderCode;
+    var msg = TempData["Msg"] as string;
+}
+
+<partial name="_PageHero" model='new WebVanChuyenLogicstic.Models.PageHeroViewModel("Đơn " + Model.OrderCode, "Chi tiết đơn hàng và báo giá.", "bi-box-seam")' />
+
+<section class="section-space">
+    <div class="container narrow-content">
+        <a asp-action="Index" class="text-decoration-none small"><i class="bi bi-arrow-left"></i> Quay lại danh sách đơn</a>
+
+        @if (!string.IsNullOrEmpty(msg))
+        {
+            <div class="alert alert-info mt-3">@msg</div>
+        }
+
+        <div class="content-card mt-3">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                <h4 class="mb-0">@Model.OrderCode</h4>
+                <span class="badge @OrderStatuses.Badge(Model.Status)">@Model.Status</span>
+            </div>
+
+            <div class="qt-facts">
+                <div><span>Lấy hàng</span><strong>@Model.PickupAddress</strong></div>
+                <div><span>Giao hàng</span><strong>@Model.DeliveryAddress</strong></div>
+                <div><span>Hàng hóa</span><strong>@(Model.CargoType ?? "—")</strong></div>
+                @if (Model.Items.Any())
+                {
+                    <ul class="small text-muted mb-0 ps-3">
+                        @foreach (var it in Model.Items.OrderBy(i => i.Id))
+                        {
+                            <li>@it.CargoTypeName × @it.Quantity@(it.WeightKg != null ? $" · {it.WeightKg:n1} kg" : "")@(it.IsFragile ? " · dễ vỡ" : "")@(string.IsNullOrEmpty(it.Note) ? "" : " · " + it.Note)</li>
+                        }
+                    </ul>
+                }
+                @if (!string.IsNullOrEmpty(Model.ReceiverName))
+                {
+                    <div><span>Người nhận</span><strong>@Model.ReceiverName · @Model.ReceiverPhone</strong></div>
+                }
+                @if (Model.Service != null)
+                {
+                    <div><span>Dịch vụ</span><strong>@Model.Service.Name</strong></div>
+                }
+                <div><span>Tạo lúc</span><strong>@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</strong></div>
+            </div>
+
+            @if (Model.QuotedPrice != null)
+            {
+                <div class="text-center my-3">
+                    <div class="text-muted small">Giá báo</div>
+                    <div class="qt-quote-price">@OrderFormat.Money(Model.QuotedPrice)</div>
+                    <div class="small text-muted">Hiệu lực đến hết ngày @(Model.QuoteValidUntil?.ToString("dd/MM/yyyy"))</div>
+                    @if (!string.IsNullOrWhiteSpace(Model.QuoteNote))
+                    {
+                        <p class="text-start mt-3 p-3" style="background:var(--surface);border-radius:var(--radius-sm)"><strong>Ghi chú về giá:</strong> @Model.QuoteNote</p>
+                    }
+                </div>
+            }
+
+            @if (Model.IsQuoteOpen)
+            {
+                <div class="d-grid gap-2">
+                    <form asp-action="Accept" asp-route-code="@Model.OrderCode" method="post">
+                        <button class="btn btn-accent btn-lg w-100">Đồng ý báo giá</button>
+                    </form>
+                    <form asp-action="Decline" asp-route-code="@Model.OrderCode" method="post" onsubmit="return confirm('Bạn chắc chắn muốn từ chối báo giá này?');">
+                        <button class="btn btn-outline-secondary w-100">Từ chối</button>
+                    </form>
+                </div>
+            }
+            else if (Model.Status == OrderStatuses.Quoted)
+            {
+                <div class="alert alert-warning mb-0">Báo giá đã hết hạn. Vui lòng <a asp-controller="Home" asp-action="Contact">liên hệ</a> để nhận báo giá mới.</div>
+            }
+            else if (Model.Status == OrderStatuses.QuoteRequested)
+            {
+                <div class="alert alert-info">Yêu cầu của bạn đang chờ chuyên viên báo giá. Bạn có thể hủy nếu không còn nhu cầu.</div>
+                <form asp-action="Cancel" asp-route-code="@Model.OrderCode" method="post" onsubmit="return confirm('Bạn chắc chắn muốn hủy yêu cầu này?');">
+                    <button class="btn btn-outline-danger w-100">Hủy yêu cầu</button>
+                </form>
+            }
+            else if (Model.Status == OrderStatuses.Confirmed)
+            {
+                <div class="alert alert-info">Đơn đã được xác nhận. Bạn vẫn có thể hủy cho đến khi hàng bắt đầu được vận chuyển.</div>
+                <form asp-action="Cancel" asp-route-code="@Model.OrderCode" method="post" onsubmit="return confirm('Bạn chắc chắn muốn hủy đơn này?');">
+                    <button class="btn btn-outline-danger w-100">Hủy đơn</button>
+                </form>
+            }
+        </div>
+
+        <div class="content-card mt-4 tracking-page">
+            <h5 class="mb-3">Hành trình</h5>
+            <div class="result-route">
+                @foreach (var ev in Model.Events.OrderBy(e => e.SequenceNumber))
+                {
+                    <div class="@(ev.IsCompleted ? "active" : "")"><i class="bi @(ev.IsCompleted ? "bi-check" : "bi-circle")"></i><b>@ev.Title</b><small>@ev.EventAt.ToString("HH:mm dd/MM/yyyy")@(string.IsNullOrEmpty(ev.Detail) ? "" : " · " + ev.Detail)</small></div>
+                }
+            </div>
+        </div>
+    </div>
+</section>

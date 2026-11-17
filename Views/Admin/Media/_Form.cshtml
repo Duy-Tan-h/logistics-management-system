@@ -1,0 +1,58 @@
+﻿@model WebVanChuyenLogicstic.Models.MediaItem
+@{
+    var isNew = Model.Id == 0;
+}
+
+<form asp-action="@(isNew ? "Create" : "Edit")" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data" class="card border-0 shadow-sm p-4" style="max-width:700px">
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <input type="hidden" asp-for="Type" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label fw-semibold">@(Model.Type == MediaTypes.Banner ? "Tiêu đề banner" : "Tên đối tác") <span class="text-danger">*</span></label>
+        <input asp-for="Title" class="form-control" placeholder="Tên đối tác / tên banner / chú thích ảnh" />
+        <span asp-validation-for="Title" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-semibold">Hình ảnh @if (isNew) {
+        <span class="text-danger">*</span>
+                }
+</label>
+        @if (!isNew && !string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <div class="mb-2"><img src="@Model.ImageUrl" alt="" style="max-height:120px;max-width:100%;object-fit:contain;background:#f5f7fa;border-radius:8px" /></div>
+        }
+        <input type="file" name="image" class="form-control" accept=".jpg,.jpeg,.png,.webp,.gif" />
+        <div class="form-text">Ảnh tối đa 3 MB. @(isNew ? "" : "Để trống nếu giữ ảnh hiện tại.")</div>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="LinkUrl" class="form-label fw-semibold">Liên kết khi bấm vào (không bắt buộc)</label>
+        <input asp-for="LinkUrl" class="form-control" placeholder="https://doitac.vn hoặc /Service" />
+        <span asp-validation-for="LinkUrl" class="text-danger small"></span>
+    </div>
+
+    <div class="row g-3 mb-4 align-items-end">
+        <div class="col-md-6">
+            <label asp-for="DisplayOrder" class="form-label fw-semibold">Thứ tự hiển thị</label>
+            <input asp-for="DisplayOrder" type="number" min="0" max="999" class="form-control" />
+            <div class="form-text">Số nhỏ hiện trước.</div>
+            <span asp-validation-for="DisplayOrder" class="text-danger small"></span>
+        </div>
+        <div class="col-md-6">
+            <div class="form-check form-switch">
+                <input asp-for="IsVisible" class="form-check-input" />
+                <label asp-for="IsVisible" class="form-check-label fw-semibold">Hiển thị trên website</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-end">
+        <a asp-action="Index" class="btn btn-light border me-2">Hủy</a>
+        <button class="btn btn-primary px-4">@(isNew ? "Thêm" : "Lưu thay đổi")</button>
+    </div>
+</form>

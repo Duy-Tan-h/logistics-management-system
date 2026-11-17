@@ -1,0 +1,62 @@
+﻿@model HomeSectionContext
+@{
+    var s = Model.Section;
+    var (titleStart, titleEnd) = s.Title.SplitLastWords(4);
+}
+<section class="section-space">
+    <div class="container">
+        <div class="section-heading text-center mx-auto">
+            @if (!string.IsNullOrEmpty(s.Kicker))
+            {
+                <span class="section-kicker"><i class="bi bi-buildings"></i>@s.Kicker</span>
+            }
+            <h2>@titleStart <span class="accent-text">@titleEnd</span></h2>
+            @if (!string.IsNullOrEmpty(s.Subtitle))
+            {
+                <p>@s.Subtitle</p>
+            }
+        </div>
+
+        <div class="project-carousel mt-3">
+            <button type="button" class="project-nav project-nav-prev" aria-label="Dự án trước"><i class="bi bi-chevron-left"></i></button>
+            <button type="button" class="project-nav project-nav-next" aria-label="Dự án tiếp theo"><i class="bi bi-chevron-right"></i></button>
+
+            <div class="project-slider">
+                @foreach (var item in s.Items)
+                {
+                    var hasLink = !string.IsNullOrEmpty(item.LinkUrl);
+                    <div class="project-card">
+                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                        {
+                            <div class="project-media">
+                                <img src="@item.ImageUrl" alt="@item.Title" loading="lazy" draggable="false" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="project-media project-media--empty" aria-hidden="true">
+                                <i class="bi @(string.IsNullOrEmpty(item.Icon) ? "bi-truck" : item.Icon)"></i>
+                            </div>
+                        }
+
+                        <div class="project-caption">@item.Title</div>
+
+                        @if (hasLink)
+                        {
+                            <span class="project-arrow" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></span>
+                        }
+
+                        <div class="project-overlay">
+                            <h3>@item.Title</h3>
+                            <p>@item.Description</p>
+                            @if (hasLink)
+                            {
+                                <a class="project-more stretched-link" href="@item.LinkUrl" draggable="false">Xem dự án <i class="bi bi-arrow-up-right"></i></a>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>

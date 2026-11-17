@@ -1,0 +1,284 @@
+@model WebVanChuyenLogicstic.Models.QuoteRequestViewModel
+@{
+    ViewData["Title"] = "Tạo đơn vận chuyển";
+    var services = (List<TransportService>)ViewBag.Services;
+    var doneCode = TempData["QuoteCode"] as string;
+    var saved = ViewBag.SavedAddresses as List<SavedAddress> ?? new List<SavedAddress>();
+    //var cargoTypes = ViewBag.CargoTypes as List<CargoType> ?? new List<CargoType>();
+}
+
+<partial name="_PageHero" model='new WebVanChuyenLogicstic.Models.PageHeroViewModel("Tạo đơn vận chuyển", "Cho chúng tôi biết về lô hàng, chuyên viên sẽ liên hệ với phương án và mức giá phù hợp.", "bi-calculator")' />
+
+<section class="qt-page">
+    <div class="container">
+        @if (doneCode != null)
+        {
+            <div class="qt-done">
+                <div class="qt-card">
+                    <div class="qt-check"><i class="bi bi-check-lg"></i></div>
+                    <h3>Đã nhận yêu cầu báo giá</h3>
+                    <p class="mb-0">Chuyên viên sẽ liên hệ với bạn qua số điện thoại đã nhập. Nếu bạn có điền email, thư xác nhận sẽ được gửi kèm mã đơn.</p>
+                    <div class="qt-code">
+                        <div><small>Mã đơn hàng</small><strong>@doneCode</strong></div>
+                        <button type="button" id="qt-copy" data-code="@doneCode" class="btn btn-sm btn-outline-secondary">Sao chép</button>
+                    </div>
+                    <p class="small">Lưu lại mã này để tra cứu tiến độ bất cứ lúc nào.</p>
+                    <div class="d-flex gap-2 justify-content-center flex-wrap">
+                        <a class="btn btn-accent" asp-controller="Tracking" asp-action="Index" asp-route-code="@doneCode">Tra cứu đơn hàng</a>
+                        <a class="btn btn-outline-secondary" asp-action="Quote">Gửi yêu cầu khác</a>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <form asp-action="Quote" method="post" id="qt-form" novalidate>
+                <div class="row g-4 align-items-start">
+                    <div class="col-lg-8">
+                        <div class="qt-card">
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                            <!-- 1. Tuyến vận chuyển -->
+                            <div class="qt-block">
+                                <div class="qt-head">
+                                    <h3 class="qt-title">Tuyến vận chuyển</h3>
+                                    <p>Nhập địa chỉ càng cụ thể, báo giá càng chính xác.</p>
+                                </div>
+                                <div class="qt-route">
+                                    <div class="qt-stop qt-stop-from">
+                                        <div class="qt-mark"><span class="qt-dot qt-dot-from"></span></div>
+                                        <div>
+                                            <label asp-for="PickupAddress" class="qt-label">Điểm lấy hàng <span class="req">*</span></label>
+                                            <input asp-for="PickupAddress" class="form-control" placeholder="Số nhà, đường, quận/huyện, tỉnh/thành" autocomplete="street-address" />
+                                            <span asp-validation-for="PickupAddress" class="text-danger small"></span>
+                                            @if (saved.Any())
+                                            {
+                                                <select class="form-select form-select-sm mt-2" data-fill="PickupAddress">
+                                                    <option value="">Chọn từ danh bạ địa chỉ…</option>
+                                                    @foreach (var a in saved)
+                                                    {
+                                                        <option value="@a.Address">@a.Label — @a.Address</option>
+                                                    }
+                                                </select>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="qt-stop qt-stop-to">
+                                        <div class="qt-mark"><span class="qt-dot qt-dot-to"></span></div>
+                                        <div>
+                                            <label asp-for="DeliveryAddress" class="qt-label">Điểm giao hàng <span class="req">*</span></label>
+                                            <input asp-for="DeliveryAddress" class="form-control" placeholder="Số nhà, đường, quận/huyện, tỉnh/thành" />
+                                            <span asp-validation-for="DeliveryAddress" class="text-danger small"></span>
+                                            @if (saved.Any())
+                                            {
+                                                <select class="form-select form-select-sm mt-2" data-fill="DeliveryAddress">
+                                                    <option value="">Chọn từ danh bạ địa chỉ…</option>
+                                                    @foreach (var a in saved)
+                                                    {
+                                                        <option value="@a.Address" data-name="@a.ContactName" data-phone="@a.Phone">@a.Label — @a.Address</option>
+                                                    }
+                                                </select>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-3 mt-1">
+                                    <div class="col-md-6">
+                                        <label asp-for="ExpectedShipDate" class="qt-label">Ngày dự kiến gửi</label>
+                                        <input asp-for="ExpectedShipDate" type="date" class="form-control" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Người nhận -->
+                            <div class="qt-block">
+                                <div class="qt-head">
+                                    <h3 class="qt-title">Người nhận hàng</h3>
+                                    <p>Thông tin người sẽ nhận hàng tại điểm giao.</p>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label asp-for="ReceiverName" class="qt-label">Họ và tên người nhận <span class="req">*</span></label>
+                                        <input asp-for="ReceiverName" class="form-control" placeholder="Tên người nhận hàng" />
+                                        <span asp-validation-for="ReceiverName" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="ReceiverPhone" class="qt-label">Số điện thoại người nhận <span class="req">*</span></label>
+                                        <input asp-for="ReceiverPhone" type="tel" class="form-control" placeholder="0901 234 567" />
+                                        <span asp-validation-for="ReceiverPhone" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 2. Hàng hóa -->
+                            <div class="qt-block">
+                                <div class="qt-head">
+                                    <h3 class="qt-title">Hàng hóa</h3>
+                                    <p>Khối lượng và số kiện có thể ước chừng nếu chưa có số chính xác.</p>
+                                </div>
+                                <partial name="_ItemsEditor" model="Model.Items" />
+                            </div>
+
+                            <!-- 3. Dịch vụ -->
+                            <div class="qt-block">
+                                <div class="qt-head">
+                                    <h3 class="qt-title">Dịch vụ</h3>
+                                    <p>Chọn dịch vụ phù hợp với lô hàng của bạn.</p>
+                                </div>
+                                <div class="qt-service">             
+                                    @foreach (var s in services)
+                                    {
+                                        <div class="qt-opt">
+                                            <input type="radio" id="svc-@s.Id" name="ServiceId" value="@s.Id" data-name="@s.Name" checked="@(Model.ServiceId == s.Id)" />
+                                            <label for="svc-@s.Id">
+                                                <span class="qt-opt-icon"><i class="bi @s.Icon"></i></span>
+                                                <span>
+                                                    <strong>@s.Name</strong>
+                                                    @if (!string.IsNullOrWhiteSpace(s.DeliveryTime))
+                                                    {
+                                                        <small>@s.DeliveryTime</small>
+                                                    }
+                                                </span>
+                                            </label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- 4. Liên hệ -->
+                            <div class="qt-block">
+                                <div class="qt-head">
+                                    <h3 class="qt-title">Thông tin liên hệ</h3>
+                                    <p>Chúng tôi chỉ dùng thông tin này để liên hệ báo giá cho đơn hàng của bạn.</p>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label asp-for="CustomerName" class="qt-label">Họ và tên <span class="req">*</span></label>
+                                        <input asp-for="CustomerName" class="form-control" placeholder="Người nhận cuộc gọi báo giá" autocomplete="name" />
+                                        <span asp-validation-for="CustomerName" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="Phone" class="qt-label">Số điện thoại <span class="req">*</span></label>
+                                        <input asp-for="Phone" type="tel" class="form-control" placeholder="0901 234 567" autocomplete="tel" />
+                                        <span asp-validation-for="Phone" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-12">
+                                        <label asp-for="Email" class="qt-label">Email</label>
+                                        <input asp-for="Email" type="email" class="form-control" placeholder="ban@example.com" autocomplete="email" />
+                                        <span class="qt-hint">Có email, bạn sẽ nhận thư xác nhận và thông báo mỗi khi đơn đổi trạng thái.</span>
+                                        <span asp-validation-for="Email" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-12">
+                                        <label asp-for="Note" class="qt-label">Ghi chú</label>
+                                        <textarea asp-for="Note" rows="3" class="form-control" placeholder="Kích thước, yêu cầu bảo quản, giờ nhận hàng..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="qt-submit">
+                                <button type="submit" class="btn btn-accent btn-lg w-100">Gửi yêu cầu báo giá</button>
+                                <small>Miễn phí, không ràng buộc.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <aside class="qt-aside">
+                            <div class="qt-summary">
+                                <h3>Yêu cầu của bạn</h3>
+                                <div class="qt-sum-row"><span>Tuyến</span><strong id="sum-route" class="is-empty">Chưa nhập</strong></div>
+                                <div class="qt-sum-row"><span>Hàng hóa</span><strong id="sum-cargo" class="is-empty">Chưa nhập</strong></div>
+                                <div class="qt-sum-row"><span>Dịch vụ</span><strong id="sum-service" class="is-empty">Chưa nhập</strong></div>
+                                <div class="qt-sum-row"><span>Dự kiến gửi</span><strong id="sum-date" class="is-empty">Chưa nhập</strong></div>
+                            </div>
+                            <div class="qt-next">
+                                <h3>Sau khi gửi</h3>
+                                <ol>
+                                    <li><b>1</b><span><strong>Nhận mã đơn</strong>Dùng mã này để tra cứu tiến độ.</span></li>
+                                    <li><b>2</b><span><strong>Chuyên viên liên hệ</strong>Xác nhận thông tin và gửi báo giá.</span></li>
+                                    <li><b>3</b><span><strong>Bạn đồng ý, chúng tôi nhận hàng</strong>Đơn chuyển sang "Đã xác nhận".</span></li>
+                                </ol>
+                            </div>
+                        </aside>
+                    </div>
+                </div>
+            </form>
+        }
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            function $(id) { return document.getElementById(id); }
+
+            // Nút sao chép mã đơn (màn hình sau khi gửi)
+            var copyBtn = $('qt-copy');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', function () {
+                    if (!navigator.clipboard) return;
+                    navigator.clipboard.writeText(copyBtn.getAttribute('data-code')).then(function () {
+                        copyBtn.textContent = 'Đã sao chép';
+                    });
+                });
+            }
+
+            // Thẻ tóm tắt cập nhật theo lúc gõ
+            var form = $('qt-form');
+            if (!form) return;
+
+            function setRow(id, text) {
+                var el = $(id);
+                el.textContent = text || 'Chưa nhập';
+                el.className = text ? '' : 'is-empty';
+            }
+            function fmtDate(v) {
+                if (!v) return '';
+                var p = v.split('-');
+                return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : v;
+            }
+            function render() {
+                var from = $('PickupAddress').value.trim();
+                var to = $('DeliveryAddress').value.trim();
+                setRow('sum-route', (from || to) ? (from || '…') + ' → ' + (to || '…') : '');
+
+                var parts = [];
+                var qty = 0, kg = 0, names = [];
+                form.querySelectorAll('[data-item]').forEach(function (r) {
+                    var sel = r.querySelector('select[data-f="CargoTypeId"]');
+                    if (sel && sel.value) {
+                        var n = sel.options[sel.selectedIndex].text.replace(' (đặc biệt)', '');
+                        if (names.indexOf(n) < 0) names.push(n);
+                    }
+                    qty += parseInt(r.querySelector('[data-f="Quantity"]').value) || 0;
+                    kg += parseFloat(r.querySelector('[data-f="WeightKg"]').value) || 0;
+                });
+                if (names.length) parts.push(names.join(', '));
+                if (kg) parts.push(kg + ' kg');
+                if (qty) parts.push(qty + ' kiện');
+                setRow('sum-cargo', parts.join(' · '));
+
+                var r = form.querySelector('input[name="ServiceId"]:checked');
+                setRow('sum-service', r ? r.getAttribute('data-name') : '');
+                setRow('sum-date', fmtDate($('ExpectedShipDate').value));
+            }
+            form.addEventListener('input', render);
+            form.addEventListener('change', render);
+            render();
+            form.querySelectorAll('select[data-fill]').forEach(function (sel) {
+                sel.addEventListener('change', function () {
+                    if (!sel.value) return;
+                    var target = sel.getAttribute('data-fill');
+                    $(target).value = sel.value;
+                    if (target === 'DeliveryAddress') {
+                        var opt = sel.options[sel.selectedIndex];
+                        if (opt.getAttribute('data-name')) $('ReceiverName').value = opt.getAttribute('data-name');
+                        if (opt.getAttribute('data-phone')) $('ReceiverPhone').value = opt.getAttribute('data-phone');
+                    }
+                    render();
+                });
+            });
+        })();
+    </script>
+}

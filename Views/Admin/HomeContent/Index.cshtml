@@ -1,0 +1,104 @@
+﻿@using WebVanChuyenLogicstic.Models
+@using WebVanChuyenLogicstic.Models.Admin
+@model List<HomeSection>
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Nội dung trang chủ";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">Nội dung trang chủ</h4>
+        <p class="text-muted small mb-0">Gõ số ở cột "Thứ tự" rồi bấm "Lưu thứ tự" để sắp xếp lại.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="/" target="_blank" class="btn btn-outline-info">Xem trang chủ</a>
+        <a asp-action="CreateSection" class="btn btn-primary">+ Thêm section mới</a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] is string ok)
+{
+    <div class="alert alert-success">@ok</div>
+}
+@if (TempData["ErrorMessage"] is string err)
+{
+    <div class="alert alert-danger">@err</div>
+}
+
+<form asp-action="ReorderSections" method="post" class="card border-0 shadow-sm p-3">
+    <table class="table table-hover align-middle mb-3">
+        <thead class="table-light">
+            <tr>
+                <th style="width:90px">Thứ tự</th>
+                <th>Loại khối</th>
+                <th>Tiêu đề</th>
+                <th>Trạng thái</th>
+                <th class="text-end">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (var i = 0; i < Model.Count; i++)
+            {
+                var s = Model[i];
+                <tr class="@(s.IsVisible ? "" : "opacity-50")">
+                    <td>
+                        <input type="hidden" name="sections[@i].Id" value="@s.Id" />
+                        <input type="number" name="sections[@i].Order" value="@s.DisplayOrder"
+                               class="form-control form-control-sm" style="width:70px" min="1" />
+                    </td>
+                    <td class="fw-semibold">
+                        @s.SectionType
+                        @if (!s.IsSystem)
+                        {
+                            <span class="badge bg-info ms-1">Tự thêm</span>
+                        }
+                    </td>
+                    <td>@s.Title</td>
+                    <td>
+                        @if (s.IsVisible)
+                        {
+                            <span class="badge bg-success">Đang hiện</span>
+                        }
+                        else
+                        {
+
+                            <span class="badge bg-secondary">Đang ẩn</span>
+                        }
+                    </td>
+                    <td class="text-end">
+                        <div class="d-inline-flex gap-1">
+                            <a asp-action="EditSection" asp-route-id="@s.Id" class="btn btn-sm btn-primary">Sửa</a>
+                            <button form="toggle-@s.Id" class="btn btn-sm btn-outline-warning">
+                                @(s.IsVisible ? "Ẩn" : "Hiện")
+                            </button>
+                            @if (!s.IsSystem)
+                            {
+                                <button form="delete-@s.Id" class="btn btn-sm btn-outline-danger"
+                                        onclick="return confirm('Xóa hẳn section này?');">
+                                    Xóa
+                                </button>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="text-end">
+        <button type="submit" class="btn btn-outline-primary">Lưu thứ tự</button>
+    </div>
+</form>
+
+@* Mỗi hàng cần form Ẩn/Hiện và Xóa riêng, nhưng đặt NGOÀI form Reorder
+   (không được lồng <form> trong <form>). Dùng thuộc tính "form" của button
+   để trỏ nút bấm vào đúng form tương ứng dù nó nằm ngoài bảng. *@
+@foreach (var s in Model)
+{
+    <form id="toggle-@s.Id" asp-action="ToggleSection" asp-route-id="@s.Id" method="post" class="d-none"></form>
+    @if (!s.IsSystem)
+    {
+        <form id="delete-@s.Id" asp-action="DeleteSection" asp-route-id="@s.Id" method="post" class="d-none"></form>
+    }
+}
+<partial name="_Pager" model="Model" />

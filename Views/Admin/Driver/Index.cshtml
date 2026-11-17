@@ -1,0 +1,59 @@
+﻿@model List<WebVanChuyenLogicstic.Models.Driver>
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Tài xế";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">Quản lý tài xế</h4>
+    <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> Thêm tài xế</a>
+</div>
+
+@if (TempData["SuccessMessage"] is string ok)
+{
+    <div class="alert alert-success">@ok</div>
+}
+@if (TempData["ErrorMessage"] is string err)
+{
+    <div class="alert alert-danger">@err</div>
+}
+
+<div class="card border-0 shadow-sm p-3">
+    <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+            <tr><th>Họ tên</th><th>SĐT</th><th>Số bằng lái</th><th>Trạng thái</th><th class="text-end">Thao tác</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var d in Model)
+            {
+                <tr>
+                    <td class="fw-semibold">@d.FullName</td>
+                    <td>@d.Phone</td>
+                    <td>@d.LicenseNumber</td>
+                    <td>
+                        @{
+                            var badge = d.Status switch
+                            {
+                                "Đang làm việc" => "success",
+                                "Nghỉ" => "secondary",
+                                _ => "warning"
+                            };
+                        }
+                        <span class="badge bg-@badge-subtle text-@badge border border-@badge">@d.Status</span>
+                    </td>
+                    <td class="text-end">
+                        <a asp-action="Edit" asp-route-id="@d.Id" class="btn btn-sm btn-outline-primary">Sửa</a>
+                        <form asp-action="Delete" asp-route-id="@d.Id" method="post" class="d-inline" onsubmit="return confirm('Xóa tài xế này?');">
+                            <button class="btn btn-sm btn-outline-danger">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            @if (!Model.Any())
+            {
+                <tr><td colspan="5" class="text-center text-muted py-4">Chưa có tài xế nào.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+<partial name="_Pager" model="Model" />

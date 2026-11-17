@@ -1,0 +1,12 @@
+@model HomeViewModel
+@{
+    ViewData["Title"] = "Vận chuyển nhanh chóng, an toàn";
+}
+
+@foreach (var section in Model.Sections)
+{
+    var context = new HomeSectionContext(section, Model);
+    var partialPath = $"~/Views/Home/Sections/_{section.SectionType}.cshtml";
+    <partial name="@partialPath" model="context" />
+    
+}

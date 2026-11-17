@@ -1,0 +1,94 @@
+﻿@model List<WebVanChuyenLogicstic.Models.Admin.CustomerRow>
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Tài khoản khách";
+    var search = ViewBag.Search as string;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h4 class="fw-bold mb-0">Tài khoản khách</h4>
+    <form method="get" action="/Admin/Customer" class="d-flex gap-2">
+        <input name="search" value="@search" class="form-control" placeholder="Tên, email hoặc số điện thoại" style="min-width:260px" />
+        <button class="btn btn-primary">Tìm</button>
+        @if (!string.IsNullOrEmpty(search))
+        {
+            <a href="/Admin/Customer" class="btn btn-light border">Xóa lọc</a>
+        }
+    </form>
+</div>
+
+@if (TempData["SuccessMessage"] is string ok)
+{
+    <div class="alert alert-success">@ok</div>
+}
+@if (ViewBag.Requests is List<PasswordResetRequest> requests && requests.Any())
+{
+    <div class="card border-warning shadow-sm p-3 mb-4">
+        <h6 class="fw-bold mb-3"><i class="bi bi-key me-1"></i> Yêu cầu cấp lại mật khẩu (@requests.Count)</h6>
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <tbody>
+                    @foreach (var r in requests)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@r.User?.FullName<br /><small class="text-muted">@r.User?.Email · @r.User?.Phone</small></td>
+                            <td><small>@r.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small></td>
+                            <td class="text-end">
+                                <a href="/Admin/Customer/Details/@r.UserId" class="btn btn-sm btn-primary">Xử lý</a>
+                                <form asp-action="DismissRequest" asp-route-id="@r.Id" method="post" class="d-inline">
+                                    <button class="btn btn-sm btn-outline-secondary">Bỏ qua</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+<div class="card border-0 shadow-sm p-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr><th>Họ tên</th><th>Email</th><th>Điện thoại</th><th class="text-center">Số đơn</th><th class="text-center">Chờ trả lời báo giá</th><th>Trạng thái</th><th class="text-end">Thao tác</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">@c.FullName</td>
+                        <td>@c.Email</td>
+                        <td>@c.Phone</td>
+                        <td class="text-center">@c.OrderCount</td>
+                        <td class="text-center">
+                            @if (c.WaitingReply > 0)
+                            {
+                                <span class="badge bg-warning text-dark">@c.WaitingReply</span>
+                            }
+                            else
+                            {
+
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                        <td>@if (c.IsActive) {
+                        <span class="badge bg-success-subtle text-success border border-success">Hoạt động</span>
+                    } else
+                    {
+
+                        <span class="badge bg-danger-subtle text-danger border border-danger">Đã khóa</span>
+                    }
+</td>
+                        <td class="text-end"><a href="/Admin/Customer/Details/@c.Id" class="btn btn-sm btn-outline-primary">Chi tiết</a></td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="7" class="text-center text-muted py-4">Không có tài khoản khách nào.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<partial name="_Pager" model="Model" />
